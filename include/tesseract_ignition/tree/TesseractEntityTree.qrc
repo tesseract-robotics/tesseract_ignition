@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/TesseractEntityTree">
+    <file>TesseractEntityTree.qml</file>
+  </qresource>
+</RCC>

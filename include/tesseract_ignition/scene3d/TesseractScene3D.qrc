@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/TesseractScene3D">
+    <file>TesseractScene3D.qml</file>
+  </qresource>
+</RCC>

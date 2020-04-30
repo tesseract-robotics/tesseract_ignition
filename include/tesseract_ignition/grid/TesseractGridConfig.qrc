@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/TesseractGridConfig">
+        <file>TesseractGridConfig.qml</file>
+    </qresource>
+</RCC>

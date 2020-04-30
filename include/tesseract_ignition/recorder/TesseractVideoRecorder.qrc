@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/TesseractVideoRecorder">
+    <file>TesseractVideoRecorder.qml</file>
+    <file>video_camera.svg</file>
+  </qresource>
+</RCC>
