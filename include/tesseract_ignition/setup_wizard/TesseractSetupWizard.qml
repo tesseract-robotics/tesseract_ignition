@@ -13,6 +13,15 @@ Item {
         RowLayout {
             anchors.fill: parent
             ToolButton {
+                Image {
+                    id: iconlogo
+                    anchors.fill: parent
+                    source: "logo.png"
+                    fillMode: Image.PreserveAspectFit
+                }
+            }
+
+            ToolButton {
                 text: qsTr("‹")
                 onClicked: wizardDrawer.close()
             }
@@ -97,6 +106,7 @@ Item {
                 width: parent.width
                 onClicked: {
                     drawerListView.currentIndex = index
+                    wizardDrawer.close()
                 }
             }
 
@@ -180,31 +190,4 @@ Item {
         anchors.bottom: parent.bottom
         anchors.horizontalCenter: parent.horizontalCenter
     }
-
-//    Flickable {
-//        id: flickable
-
-//        anchors.fill: parent
-//        anchors.topMargin: overlayHeader.height
-
-//        topMargin: 20
-//        bottomMargin: 20
-//        contentHeight: pageLoader.height
-
-//        Loader { id: pageLoader }
-
-//        ScrollIndicator.vertical: ScrollIndicator { }
-
-//        Connections{
-//            target: drawerListView
-//            onCurrentIndexChanged: {
-//                if (drawerListView.currentIndex == 0) {
-//                    pageLoader.source = "LoadSetupWizardFiles.qml"
-//                }
-//                else if (drawerListView.currentIndex == 1) {
-//                    pageLoader.source = "AllowedCollisionEditor.qml"
-//                }
-//            }
-//        }
-//    }
 }
