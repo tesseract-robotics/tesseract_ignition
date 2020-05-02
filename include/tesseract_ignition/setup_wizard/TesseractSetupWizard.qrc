@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/TesseractSetupWizard">
-        <file>TesseractSetupWizardForm.ui.qml</file>
-        <file>TesseractSetupWizard.qml</file>
-    </qresource>
-</RCC>

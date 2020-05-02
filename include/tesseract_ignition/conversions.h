@@ -13,10 +13,13 @@
 #include <tesseract_scene_graph/graph.h>
 #include <tesseract_scene_graph/link.h>
 #include <tesseract_scene_graph/joint.h>
+#include <tesseract_ignition/entity_manager.h>
 
 namespace tesseract_ignition
 {
+
 bool toMsg(ignition::msgs::Scene& scene_msg,
+           EntityManager& entity_manager,
            const tesseract_scene_graph::SceneGraph& scene_graph,
            const tesseract_common::TransformMap& link_transforms);
 

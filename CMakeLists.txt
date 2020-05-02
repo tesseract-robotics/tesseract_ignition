@@ -127,7 +127,7 @@ target_include_directories(TesseractVideoRecorder SYSTEM PUBLIC
     ${IGNITION-TRANSPORT_INCLUDE_DIRS}
     ${IGNITION-MSGS_INCLUDE_DIRS})
 
-add_library(TesseractIgnitionVisualization SHARED src/tesseract_ignition_visualization.cpp src/conversions.cpp)
+add_library(TesseractIgnitionVisualization SHARED src/tesseract_ignition_visualization.cpp src/conversions.cpp src/entity_manager.cpp)
 target_link_libraries(TesseractIgnitionVisualization PUBLIC
   tesseract::tesseract_environment_core
   tesseract::tesseract_visualization

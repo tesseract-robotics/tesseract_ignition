@@ -50,6 +50,21 @@ int main(int _argc, char** _argv)
     plotting = std::make_shared<tesseract_ignition::TesseractIgnitionVisualization>(env);
   }
 
+  long num_steps = 100;
+  std::vector<std::string> joint_names = {"joint_a1", "joint_a2", "joint_a3", "joint_a4", "joint_a5", "joint_a6", "joint_a7"};
+  long num_joints = static_cast<long>(joint_names.size());
+  tesseract_common::TrajArray traj;
+  traj.resize(num_steps, num_joints);
+  for (long i = 0; i < num_steps; ++i)
+  {
+    traj.row(i) = Eigen::VectorXd::Zero(num_joints);
+    traj(i, 0) = i * 0.01;
+    traj(i, 1) = 0.5;
+  }
+
+  plotting->waitForInput();
+  plotting->plotTrajectory(joint_names, traj);
+
   ignition::transport::waitForShutdown();
   return 0;
 }

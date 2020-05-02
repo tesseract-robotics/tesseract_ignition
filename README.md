@@ -22,12 +22,10 @@
 * If using Theme do not manually set color, it is controlled by the Theme.
 
 ## Setup
-This application uses the ros_scxml library which itself uses the Qt 5.12 library.  Assuming that you have followed the installation instructions for this package then you should've already configure the corresponding environment variables:
-```
-export PATH="[path to QT5.12]/cmake:$PATH"
-export LD_LIBRARY_PATH=[path to QT5.12]/gcc_64/lib:$LD_LIBRARY_PATH
-export QT_PLUGIN_PATH=[path to QT5.12]/gcc_64/plugins
-export QML2_IMPORT_PATH="[path to QT5.12]/qml
+For ignition to find the plugins built by this package you must set the following environment variable.
+
+``` bash
+export IGN_GUI_PLUGIN_PATH=/home/larmstrong/catkin_ws/trajopt_only_ws/devel/lib/
 ```
 
 ## Questions

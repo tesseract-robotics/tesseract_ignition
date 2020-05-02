@@ -3,6 +3,7 @@
 
 #include <tesseract_visualization/visualization.h>
 #include <tesseract_environment/core/environment.h>
+#include <tesseract_ignition/entity_manager.h>
 #include <ignition/msgs/scene.pb.h>
 #include <ignition/msgs/boolean.pb.h>
 #include <ignition/transport/Node.hh>
@@ -63,16 +64,13 @@ public:
   /** @brief Pause code and wait for enter key in terminal*/
   void waitForInput() override;
 
-  void publishInitialScene();
-
 private:
   tesseract_environment::Environment::ConstPtr env_; /**< The Env */
-  ignition::transport::Node node_;                     /**< Ignition communication node. */
-  ignition::transport::Node::Publisher scene_pub_;     /**< Scene publisher */
-  ignition::transport::Node::Publisher pose_pub_;      /**< Pose publisher */
-  ignition::transport::Node::Publisher deletion_pub_;  /**< Deletion publisher */
-
-  bool initial_scene_published_ {false};
+  ignition::transport::Node node_;                       /**< Ignition communication node. */
+  ignition::transport::Node::Publisher scene_pub_;       /**< Scene publisher */
+  ignition::transport::Node::Publisher pose_pub_;        /**< Pose publisher */
+  ignition::transport::Node::Publisher deletion_pub_;    /**< Deletion publisher */
+  EntityManager entity_manager_;
 
   bool OnSceneRequest(ignition::msgs::Scene& msg);
 };
