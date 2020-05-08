@@ -8,6 +8,7 @@ find_package(tesseract_environment REQUIRED)
 find_package(tesseract_support REQUIRED)
 find_package(tesseract_urdf REQUIRED)
 find_package(tesseract_visualization REQUIRED)
+find_package(tesseract REQUIRED)
 
 # Find ignition-gui
 find_package(ignition-gui3 REQUIRED)
@@ -31,6 +32,23 @@ link_directories(
   ${IGNITION-TRANSPORT_LIBRARY_DIRS}
   ${IGNITION-MSGS_LIBRARY_DIRS}
 )
+
+add_library(${PROJECT_NAME} SHARED src/conversions.cpp src/entity_manager.cpp)
+target_link_libraries(${PROJECT_NAME} PUBLIC
+  tesseract::tesseract_environment_core
+  tesseract::tesseract_visualization
+  tesseract::tesseract_common
+  ${IGNITION-COMMON_LIBRARIES}
+  ${IGNITION-RENDERING_LIBRARIES}
+  ${IGNITION-MSGS_LIBRARIES})
+tesseract_target_compile_options(${PROJECT_NAME} PUBLIC)
+target_include_directories(${PROJECT_NAME} PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<INSTALL_INTERFACE:include>")
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
+    ${IGNITION-COMMON_INCLUDE_DIRS}
+    ${IGNITION-RENDERING_INCLUDE_DIRS}
+    ${IGNITION-MSGS_INCLUDE_DIRS})
 
 QT5_WRAP_CPP(TesseractScene3D_headers_MOC include/tesseract_ignition/scene3d/tesseract_scene3d.h)
 QT5_ADD_RESOURCES(TesseractScene3D_resources_RCC include/tesseract_ignition/scene3d/TesseractScene3D.qrc)
@@ -86,14 +104,28 @@ target_include_directories(TesseractLoad SYSTEM PUBLIC
     ${IGNITION-COMMON_INCLUDE_DIRS}
     ${IGNITION-RENDERING_INCLUDE_DIRS})
 
-QT5_WRAP_CPP(TesseractSetupWizard_headers_MOC include/tesseract_ignition/setup_wizard/tesseract_setup_wizard.h)
+QT5_WRAP_CPP(TesseractSetupWizard_headers_MOC
+  include/tesseract_ignition/setup_wizard/tesseract_setup_wizard.h
+  include/tesseract_ignition/setup_wizard/models/joint_list_model.h
+  include/tesseract_ignition/setup_wizard/models/allowed_collision_matrix_model.h
+  include/tesseract_ignition/setup_wizard/models/kinematic_groups_model.h
+  include/tesseract_ignition/setup_wizard/models/user_defined_joint_states_model.h)
 QT5_ADD_RESOURCES(TesseractSetupWizard_resources_RCC include/tesseract_ignition/setup_wizard/TesseractSetupWizard.qrc)
 
-add_library(TesseractSetupWizard SHARED ${TesseractSetupWizard_headers_MOC} src/tesseract_setup_wizard.cpp  ${TesseractSetupWizard_resources_RCC})
+add_library(TesseractSetupWizard SHARED
+  ${TesseractSetupWizard_headers_MOC}
+  src/setup_wizard/tesseract_setup_wizard.cpp
+  src/setup_wizard/models/joint_list_model.cpp
+  src/setup_wizard/models/allowed_collision_matrix_model.cpp
+  src/setup_wizard/models/kinematic_groups_model.cpp
+  src/setup_wizard/models/user_defined_joint_states_model.cpp
+  ${TesseractSetupWizard_resources_RCC})
 target_link_libraries(TesseractSetupWizard PUBLIC
+  ${PROJECT_NAME}
   tesseract::tesseract_environment_kdl
   tesseract::tesseract_support
   tesseract::tesseract_urdf
+  tesseract::tesseract
   ${IGNITION-COMMON_LIBRARIES}
   ${IGNITION-GUI_LIBRARIES}
   ${IGNITION-RENDERING_LIBRARIES}
@@ -127,8 +159,9 @@ target_include_directories(TesseractVideoRecorder SYSTEM PUBLIC
     ${IGNITION-TRANSPORT_INCLUDE_DIRS}
     ${IGNITION-MSGS_INCLUDE_DIRS})
 
-add_library(TesseractIgnitionVisualization SHARED src/tesseract_ignition_visualization.cpp src/conversions.cpp src/entity_manager.cpp)
+add_library(TesseractIgnitionVisualization SHARED src/tesseract_ignition_visualization.cpp)
 target_link_libraries(TesseractIgnitionVisualization PUBLIC
+  ${PROJECT_NAME}
   tesseract::tesseract_environment_core
   tesseract::tesseract_visualization
   tesseract::tesseract_common
@@ -176,6 +209,7 @@ target_include_directories(demo_tesseract PUBLIC
     "$<INSTALL_INTERFACE:include>")
 
 tesseract_configure_package(
+  ${PROJECT_NAME}
   TesseractScene3D
   TesseractGridConfig
   TesseractLoad

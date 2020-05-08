@@ -10,77 +10,42 @@ Item {
     id: element
     anchors.fill: parent
 
+    //  Models that should get assigned
+    property ListModel kinematicGroupsModel: kinematicGroupsModel
+    property ListModel linkModel: linkModel
+    property ListModel jointModel: jointModel
+
+    // Exposed objects
     property alias removeGroupButton: removeGroupButton
-    property alias kinematicGroupsModel: kinematicGroupsModel
-    property alias linkModel: linkModel
-    property alias jointModel: jointModel
     property alias groupsTableView: groupsTableView
     property alias groupNameTextField: groupNameTextField
     property alias baselinkComboBox: baselinkComboBox
     property alias tiplinkComboBox: tiplinkComboBox
+    property alias chainGroupAddButton: chainGroupAddButton
+
     property alias removeJointButton: removeJointButton
-    property alias jointListViewModel: jointListViewModel
     property alias jointListView: jointListView
     property alias jointNamesComboBox: jointNamesComboBox
     property alias addJointButton: addJointButton
-    property alias chainGroupAddButton: chainGroupAddButton
     property alias jointGroupAddButton: jointGroupAddButton
 
-    ListModel {
-        id: kinematicGroupsModel
-        ListElement {
-            name: "Grey"
-            type: "chain"
-            data: "base_link; tip_link"
-        }
-
-        ListElement {
-            name: "Red"
-            type: "joint"
-            data: "base_link; tip_link"
-        }
-
-        ListElement {
-            name: "type"
-            type: "link"
-            data: "base_link; tip_link"
-        }
-    }
-
-    ListModel {
-        id: linkModel
-        ListElement {
-            text: "Grey"
-        }
-
-        ListElement {
-            text: "Red"
-        }
-
-        ListElement {
-            text: "type"
-        }
-    }
-
-    ListModel {
-        id: jointModel
-        ListElement {
-            text: "Grey"
-        }
-
-        ListElement {
-            text: "Red"
-        }
-
-        ListElement {
-            text: "type"
-        }
-    }
+    property alias removeLinkButton: removeLinkButton
+    property alias linkListView: linkListView
+    property alias linkNamesComboBox: linkNamesComboBox
+    property alias addLinkButton: addLinkButton
+    property alias linkGroupAddButton: linkGroupAddButton
 
     ListModel {
         id: jointListViewModel
         ListElement {
-            name: "type"
+            name: "joint_1"
+        }
+    }
+
+    ListModel {
+        id: linkListViewModel
+        ListElement {
+            name: "link_1"
         }
     }
 
@@ -92,7 +57,7 @@ Item {
         TabBar {
             id: tabBar
             anchors.topMargin: 10
-            currentIndex: 1
+            currentIndex: 2
             anchors.right: parent.right
             anchors.left: parent.left
             anchors.top: groupNameLabel.bottom
@@ -155,6 +120,7 @@ Item {
 
                 ComboBox {
                     id: baselinkComboBox
+                    textRole: "display"
                     anchors.left: label.right
                     anchors.leftMargin: 5
                     anchors.right: parent.right
@@ -165,7 +131,7 @@ Item {
 
                 ComboBox {
                     id: tiplinkComboBox
-                    y: 56
+                    textRole: "display"
                     anchors.left: label1.right
                     anchors.leftMargin: 5
                     anchors.right: parent.right
@@ -190,8 +156,7 @@ Item {
 
                 ComboBox {
                     id: jointNamesComboBox
-                    y: 5
-                    height: 40
+                    textRole: "name"
                     anchors.right: addJointButton.left
                     anchors.rightMargin: 5
                     anchors.verticalCenter: label2.verticalCenter
@@ -225,8 +190,7 @@ Item {
 
                 Button {
                     id: addJointButton
-                    x: 337
-                    y: 56
+                    width: 110
                     text: qsTr("Add")
                     anchors.right: parent.right
                     anchors.rightMargin: 5
@@ -235,7 +199,7 @@ Item {
 
                 Button {
                     id: removeJointButton
-                    x: 225
+                    width: 110
                     text: qsTr("Remove")
                     anchors.top: addJointButton.bottom
                     anchors.topMargin: 5
@@ -245,8 +209,7 @@ Item {
 
                 Button {
                     id: jointGroupAddButton
-                    x: 540
-                    y: 126
+                    width: 110
                     text: qsTr("Add Group")
                     anchors.bottom: parent.bottom
                     anchors.bottomMargin: 5
@@ -256,6 +219,80 @@ Item {
             }
             Item {
                 id: linksTab
+
+                Label {
+                    id: label3
+                    height: 40
+                    text: qsTr("Link Names:")
+                    anchors.left: parent.left
+                    anchors.leftMargin: 5
+                    anchors.top: parent.top
+                    anchors.topMargin: 5
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                ComboBox {
+                    id: linkNamesComboBox
+                    textRole: "display"
+                    anchors.right: addLinkButton.left
+                    anchors.rightMargin: 5
+                    anchors.verticalCenter: label3.verticalCenter
+                    anchors.left: label3.right
+                    anchors.leftMargin: 5
+                    model: linkModel
+                }
+                Frame {
+                    clip: true
+                    padding: 5
+                    anchors.right: removeLinkButton.left
+                    anchors.rightMargin: 5
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 5
+                    anchors.top: linkNamesComboBox.bottom
+                    anchors.topMargin: 5
+                    anchors.left: linkNamesComboBox.left
+                    anchors.leftMargin: 0
+                    ListView {
+                        id: linkListView
+                        spacing: 5
+                        anchors.fill: parent
+                        highlight: Rectangle {
+                            color: "lightsteelblue"
+                            radius: 5
+                        }
+                        focus: true
+                        model: linkListViewModel
+                    }
+                }
+
+                Button {
+                    id: addLinkButton
+                    width: 110
+                    text: qsTr("Add")
+                    anchors.right: parent.right
+                    anchors.rightMargin: 5
+                    anchors.verticalCenter: label3.verticalCenter
+                }
+
+                Button {
+                    id: removeLinkButton
+                    width: 110
+                    text: qsTr("Remove")
+                    anchors.top: addLinkButton.bottom
+                    anchors.topMargin: 5
+                    anchors.right: parent.right
+                    anchors.rightMargin: 5
+                }
+
+                Button {
+                    id: linkGroupAddButton
+                    width: 110
+                    text: qsTr("Add Group")
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 5
+                    anchors.right: parent.right
+                    anchors.rightMargin: 5
+                }
             }
         }
 

@@ -52,6 +52,9 @@ public:
    */
   int getVisual(const std::string& name);
 
+  /** @brief Clear interanl data */
+  void clear();
+
 private:
   std::unordered_map<std::string, int> link_id_map_;  /**< Stores entity id for each link */
   std::unordered_map<std::string, int> model_id_map_;  /**< Stores entity id for each link */

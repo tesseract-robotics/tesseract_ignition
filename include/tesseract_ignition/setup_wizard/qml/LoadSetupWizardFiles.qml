@@ -6,7 +6,6 @@ import QtQuick.Layouts 1.3
 
 ColumnLayout {
   id: tesseractSetupWizardLayout
-  width: 400
   Layout.minimumWidth: 400
   Layout.minimumHeight: 400
 

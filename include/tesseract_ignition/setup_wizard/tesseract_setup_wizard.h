@@ -24,16 +24,24 @@ namespace tesseract_ignition
 
         void LoadConfig( const tinyxml2::XMLElement * _pluginElem) override;
 
-      public slots:
+
         /**
          * @brief Callback trigged when the load button is pressed.
          * @param[in] _urdf_filepath The urdf file path.
          * @param[in] _srdf_filepath The srdf file path.
          */
-        void onLoad(const QString &_urdf_filepath, const QString& _srdf_filepath);
+        Q_INVOKABLE void onLoad(const QString &urdf_filepath, const QString& srdf_filepath);
+        Q_INVOKABLE void onAddChainGroup(const QString &group_name, const QString& base_link, const QString& tip_link);
+        Q_INVOKABLE void onAddJointGroup(const QString &group_name, const QStringList& joint_list);
+        Q_INVOKABLE void onAddLinkGroup(const QString &group_name, const QStringList& link_list);
+        Q_INVOKABLE void onGenerateACM(long resolution);
+        Q_INVOKABLE void onLoadJointGroup(const QString &group_name);
+        Q_INVOKABLE void onJointValue(const QString &joint_name, double joint_value);
 
-      protected slots:
-        void updateTesseract();
+
+
+      protected:
+        Q_INVOKABLE void updateTesseract();
 
         /** @brief Used to filter scroll wheel events.
           * @param[in] _o Object that receives the event.

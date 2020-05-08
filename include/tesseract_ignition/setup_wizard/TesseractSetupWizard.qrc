@@ -1,0 +1,14 @@
+<RCC>
+  <qresource prefix="/TesseractSetupWizard">
+    <file>qml/AllowedCollisionEditor.qml</file>
+    <file>qml/AllowedCollisionEditorForm.ui.qml</file>
+    <file>qml/KinematicGroups.qml</file>
+    <file>qml/KinematicGroupsForm.ui.qml</file>
+    <file>qml/LoadSetupWizardFiles.qml</file>
+    <file>qml/LoadSetupWizardFilesForm.ui.qml</file>
+    <file>qml/UserDefinedJointStates.qml</file>
+    <file>qml/UserDefinedJointStatesForm.ui.qml</file>
+    <file>TesseractSetupWizard.qml</file>
+    <file>logo.png</file>
+  </qresource>
+</RCC>

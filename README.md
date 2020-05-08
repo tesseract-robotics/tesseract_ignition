@@ -20,6 +20,8 @@
     }
     ```
 * If using Theme do not manually set color, it is controlled by the Theme.
+* If using data models write your qml code to access the model through the object. This way if the model is assigned a
+  different model your UI will continue to work.
 
 ## Setup
 For ignition to find the plugins built by this package you must set the following environment variable.

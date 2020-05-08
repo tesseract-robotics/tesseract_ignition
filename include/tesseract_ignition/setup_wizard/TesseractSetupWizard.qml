@@ -3,7 +3,8 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 
 Item {
-    id: window
+    id: tsw
+    anchors.fill: parent
 
     ToolBar {
         id: overlayHeader
@@ -16,7 +17,7 @@ Item {
                 Image {
                     id: iconlogo
                     anchors.fill: parent
-                    source: "logo.png"
+                    source: "qrc:/TesseractSetupWizard/logo.png"
                     fillMode: Image.PreserveAspectFit
                 }
             }
@@ -48,8 +49,10 @@ Item {
         visible: false
 
         y: overlayHeader.height
-        width: (window.width / 4) > 300 ? 300 : (window.width / 4)
-        height: window.height - overlayHeader.height
+        x: parent.x
+
+        width: (tsw.width / 4) > 300 ? 300 : (tsw.width / 4)
+        height: tsw.height - overlayHeader.height
 
         ListView {
             id: drawerListView
@@ -67,7 +70,7 @@ Item {
                 Image {
                     id: logo
                     width: parent.width
-                    source: "logo.png"
+                    source: "qrc:/TesseractSetupWizard/logo.png"
                     fillMode: implicitWidth > width ? Image.PreserveAspectFit : Image.Pad
                 }
 
@@ -106,7 +109,6 @@ Item {
                 width: parent.width
                 onClicked: {
                     drawerListView.currentIndex = index
-                    wizardDrawer.close()
                 }
             }
 
@@ -135,7 +137,7 @@ Item {
             Loader {
                 id: loadPageLoader
                 anchors.fill: parent
-                source: "LoadSetupWizardFiles.qml"
+                source: "qrc:/TesseractSetupWizard/qml/LoadSetupWizardFiles.qml";
             }
         }
 
@@ -152,7 +154,10 @@ Item {
             Loader {
                 id: acmPageLoader
                 anchors.fill: parent
-                source: "AllowedCollisionEditor.qml"
+                source: "qrc:/TesseractSetupWizard/qml/AllowedCollisionEditor.qml"
+                onLoaded: {
+                    item.setAllowedCollisionMatrixModel(acmModel);
+                }
             }
         }
 
@@ -169,7 +174,34 @@ Item {
             Loader {
                 id: kinGroupsPageLoader
                 anchors.fill: parent
-                source: "KinematicGroups.qml"
+                source: "qrc:/TesseractSetupWizard/qml/KinematicGroups.qml"
+                onLoaded: {
+                    item.setLinkModel(linkModel);
+                    item.setJointModel(jointModel);
+                    item.setKinematicGroupsModel(kinematicGroupsModel);
+                }
+            }
+        }
+
+        Page {
+            y: overlayHeader.height
+            header: Label {
+                text: qsTr("User Defined Joint States")
+                font.underline: true
+                topPadding: 10
+                horizontalAlignment: Text.AlignHCenter
+                font.pointSize: 11
+                height: 30
+            }
+            Loader {
+                id: userDefinedStatesPageLoader
+                anchors.fill: parent
+                source: "qrc:/TesseractSetupWizard/qml/UserDefinedJointStates.qml"
+                onLoaded: {
+                    item.setUserDefinedStatesModel(userDefinedJointStatesModel);
+                    item.setJointGroupsModel(jointGroupModel);
+                    item.setKinematicGroupsModel(kinematicGroupsModel);
+                }
             }
         }
 

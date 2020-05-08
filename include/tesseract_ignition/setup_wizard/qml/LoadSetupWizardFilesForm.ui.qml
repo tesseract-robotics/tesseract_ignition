@@ -3,13 +3,12 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 
 Item {
-
+    id: loadSetupWizardFilesPage
     property alias loadButton: loadButton
     property alias srdfTextField: srdfTextField
     property alias srdfBrowseButton: srdfBrowseButton
     property alias urdfTextField: urdfTextField
     property alias urdfBrowseButton: urdfBrowseButton
-    id: loadSetupWizardFilesPage
 
     Label {
         id: urdfLabel

@@ -47,4 +47,12 @@ int EntityManager::getVisual(const std::string& name)
 
   return it->second;
 }
+
+void EntityManager::clear()
+{
+  model_id_map_.clear();
+  link_id_map_.clear();
+  visual_id_map_.clear();
+  entity_counter_ = 1000;
+}
 }
