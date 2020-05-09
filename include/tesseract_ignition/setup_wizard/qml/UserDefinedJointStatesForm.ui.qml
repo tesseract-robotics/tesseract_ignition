@@ -9,17 +9,12 @@ import QtQuick.Controls.Styles 1.4
 Item {
     id: element
 
-    //  Models that should get assigned
-    property ListModel userDefinedStatesModel: userDefinedStatesModel
-    property ListModel kinematicGroupsModel: kinematicGroupsModel
-    property ListModel jointGroupsModel: jointGroupsModel
-
-    property alias jointGroupListView: jointGroupListView
     property alias removeUserDefinedJointStateButton: removeUserDefinedJointStateButton
     property alias userDefinedJointStateTableView: userDefinedJointStateTableView
     property alias addUserDefinedJointStateButton: addUserDefinedJointStateButton
     property alias userDefinedJointStateNameTextField: userDefinedJointStateNameTextField
     property alias jointStateGroupNameComboBox: jointStateGroupNameComboBox
+    property alias jointGroupListView: jointGroupListView
 
     Label {
         id: userDefinedJointStateNameLabel
@@ -50,14 +45,14 @@ Item {
 
     QC1.TableView {
         id: userDefinedJointStateTableView
-        height: element.height * 0.25
+        height: element.height * 0.33
         anchors.bottom: removeUserDefinedJointStateButton.top
         anchors.bottomMargin: 8
         anchors.left: parent.left
         anchors.leftMargin: 5
         anchors.right: parent.right
         anchors.rightMargin: 5
-        model: userDefinedStatesModel
+        model: userDefinedJointStatesModel
 
         QC1.TableViewColumn {
             id: groupNameColumn
@@ -130,67 +125,7 @@ Item {
         anchors.topMargin: 10
         anchors.left: parent.left
         anchors.leftMargin: 5
-        model: jointGroupsModel
-        delegate: Item {
-            id: element1
-            width: parent.width
-            height: 40
-
-            Label {
-                id: jointLabel1
-                width: 125
-                height: 40
-                text: model.name
-                anchors.left: parent.left
-                anchors.leftMargin: 5
-                verticalAlignment: Text.AlignVCenter
-            }
-            Slider {
-                id: slider1
-                stepSize: 0.01
-                anchors.right: spinBox1.left
-                anchors.rightMargin: 5
-                anchors.left: jointLabel1.right
-                anchors.leftMargin: 5
-                anchors.verticalCenter: jointLabel1.verticalCenter
-                from: model.min
-                to: model.max
-                value: model.data
-                Binding on value {
-                    when: spinBox1.focus
-                    value: spinBox1.value
-                }
-                onValueChanged: {
-                    model.data = value
-                }
-                Connections {
-                    target: slider1
-                    onValueChanged: TesseractSetupWizard.onJointValue(
-                                        model.name, slider1.value)
-                }
-            }
-            QC1.SpinBox {
-                id: spinBox1
-                anchors.verticalCenter: jointLabel1.verticalCenter
-                anchors.right: parent.right
-                anchors.rightMargin: 5
-                style: SpinBoxStyle {
-                    background: Rectangle {
-                        implicitWidth: 70
-                        implicitHeight: 40
-                        border.color: "gray"
-                    }
-                }
-                decimals: 2
-                value: model.data
-                minimumValue: model.min
-                maximumValue: model.max
-                Binding on value {
-                    when: slider1.pressed
-                    value: slider1.value
-                }
-            }
-        }
+        model: jointGroupModel
 
         ScrollIndicator.vertical: ScrollIndicator {
         }

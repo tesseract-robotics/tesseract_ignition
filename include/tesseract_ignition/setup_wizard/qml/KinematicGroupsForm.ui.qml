@@ -11,13 +11,6 @@ Item {
     anchors.fill: parent
     width: 400
 
-    //  Models that should get assigned
-    property ListModel kinematicGroupsModel: kinematicGroupsModel
-    property ListModel linkModel: linkModel
-    property ListModel jointModel: jointModel
-    property ListModel jointListViewModel: jointListViewModel
-    property ListModel linkListViewModel: linkListViewModel
-
     // Exposed objects
     property alias removeGroupButton: removeGroupButton
     property alias groupsTableView: groupsTableView

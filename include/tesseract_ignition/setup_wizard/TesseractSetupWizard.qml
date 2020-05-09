@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
+import "qrc:/TesseractSetupWizard/qml"
 
 Item {
     id: tsw
@@ -134,10 +135,9 @@ Item {
                 font.pointSize: 11
                 height: 30
             }
-            Loader {
-                id: loadPageLoader
+            LoadSetupWizardFiles {
+                id: loadPage
                 anchors.fill: parent
-                source: "qrc:/TesseractSetupWizard/LoadSetupWizardFiles.qml";
             }
         }
 
@@ -151,13 +151,9 @@ Item {
                 font.pointSize: 11
                 height: 30
             }
-            Loader {
-                id: acmPageLoader
+            AllowedCollisionEditor {
+                id: acmPage
                 anchors.fill: parent
-                source: "qrc:/TesseractSetupWizard/AllowedCollisionEditor.qml"
-                onLoaded: {
-                    item.setAllowedCollisionMatrixModel(acmModel);
-                }
             }
         }
 
@@ -171,17 +167,9 @@ Item {
                 font.pointSize: 11
                 height: 30
             }
-            Loader {
-                id: kinGroupsPageLoader
+            KinematicGroups {
+                id: kinGroupsPage
                 anchors.fill: parent
-                source: "qrc:/TesseractSetupWizard/KinematicGroups.qml"
-                onLoaded: {
-                    item.setLinkModel(linkModel);
-                    item.setJointModel(jointModel);
-                    item.setKinematicGroupsModel(kinematicGroupsModel);
-                    item.setLinkListViewModel(linkListViewModel)
-                    item.setJointListViewModel(jointListViewModel)
-                }
             }
         }
 
@@ -195,15 +183,9 @@ Item {
                 font.pointSize: 11
                 height: 30
             }
-            Loader {
-                id: userDefinedStatesPageLoader
+            UserDefinedJointStates {
+                id: userDefinedStatesPage
                 anchors.fill: parent
-                source: "qrc:/TesseractSetupWizard/UserDefinedJointStates.qml"
-                onLoaded: {
-                    item.setUserDefinedStatesModel(userDefinedJointStatesModel);
-                    item.setJointGroupsModel(jointGroupModel);
-                    item.setKinematicGroupsModel(kinematicGroupsModel);
-                }
             }
         }
 
