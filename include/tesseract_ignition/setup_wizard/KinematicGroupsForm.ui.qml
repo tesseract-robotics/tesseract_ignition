@@ -9,11 +9,14 @@ import QtQuick.Controls.Styles 1.4
 Item {
     id: element
     anchors.fill: parent
+    width: 400
 
     //  Models that should get assigned
     property ListModel kinematicGroupsModel: kinematicGroupsModel
     property ListModel linkModel: linkModel
     property ListModel jointModel: jointModel
+    property ListModel jointListViewModel: jointListViewModel
+    property ListModel linkListViewModel: linkListViewModel
 
     // Exposed objects
     property alias removeGroupButton: removeGroupButton
@@ -35,20 +38,6 @@ Item {
     property alias addLinkButton: addLinkButton
     property alias linkGroupAddButton: linkGroupAddButton
 
-    ListModel {
-        id: jointListViewModel
-        ListElement {
-            name: "joint_1"
-        }
-    }
-
-    ListModel {
-        id: linkListViewModel
-        ListElement {
-            name: "link_1"
-        }
-    }
-
     Frame {
         id: frame
         padding: 0
@@ -57,7 +46,7 @@ Item {
         TabBar {
             id: tabBar
             anchors.topMargin: 10
-            currentIndex: 2
+            currentIndex: 0
             anchors.right: parent.right
             anchors.left: parent.left
             anchors.top: groupNameLabel.bottom
@@ -139,6 +128,13 @@ Item {
                     anchors.verticalCenter: label1.verticalCenter
                     model: linkModel
                 }
+                Connections {
+                    target: chainGroupAddButton
+                    onClicked: TesseractSetupWizard.onAddChainGroup(
+                                   groupNameTextField.text,
+                                   baselinkComboBox.currentText,
+                                   tiplinkComboBox.currentText)
+                }
             }
             Item {
                 id: jointsTab
@@ -215,6 +211,21 @@ Item {
                     anchors.bottomMargin: 5
                     anchors.right: parent.right
                     anchors.rightMargin: 5
+                }
+                Connections {
+                    target: jointGroupAddButton
+                    onClicked: TesseractSetupWizard.onAddJointGroup(
+                                   groupNameTextField.text)
+                }
+                Connections {
+                    target: addJointButton
+                    onClicked: TesseractSetupWizard.onAddJointGroupJoint(
+                                   jointNamesComboBox.currentText)
+                }
+                Connections {
+                    target: removeJointButton
+                    onClicked: TesseractSetupWizard.onRemoveJointGroupJoint(
+                                   jointListView.currentRow)
                 }
             }
             Item {
@@ -293,6 +304,21 @@ Item {
                     anchors.right: parent.right
                     anchors.rightMargin: 5
                 }
+                Connections {
+                    target: linkGroupAddButton
+                    onClicked: TesseractSetupWizard.onAddLinkGroup(
+                                   groupNameTextField.text)
+                }
+                Connections {
+                    target: addLinkButton
+                    onClicked: TesseractSetupWizard.onAddLinkGroupLink(
+                                   linkNamesComboBox.currentText)
+                }
+                Connections {
+                    target: removeLinkButton
+                    onClicked: TesseractSetupWizard.onRemoveLinkGroupLink(
+                                   linkListView.currentRow)
+                }
             }
         }
 
@@ -363,13 +389,10 @@ Item {
             anchors.right: parent.right
             anchors.rightMargin: 5
         }
+        Connections {
+            target: removeGroupButton
+            onClicked: TesseractSetupWizard.onRemoveKinematicGroup(
+                           groupsTableView.currentRow)
+        }
     }
 }
-
-
-
-
-/*##^## Designer {
-    D{i:0;autoSize:true;height:480;width:640}
-}
- ##^##*/

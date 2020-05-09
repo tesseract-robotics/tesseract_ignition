@@ -4,9 +4,9 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 
 Item {
-    //  Models that should get assigned
-    property ListModel acmModel: acmModel
 
+    //  Models that should get assigned
+    property alias acmModel: acmModel
     property alias removeButton: removeButton
     property alias acmTableView: acmTableView
     property alias generateButton: generateButton
@@ -45,6 +45,15 @@ Item {
         anchors.right: parent.right
         anchors.rightMargin: 5
         anchors.verticalCenter: slider.verticalCenter
+    }
+
+    ListModel {
+        id: acmModel
+        ListElement {
+            link1: "link_1"
+            link2: "link_2"
+            reason: "adjacent"
+        }
     }
 
     // https://stackoverflow.com/questions/45168702/canonical-way-to-make-custom-tableview-from-listview-in-qt-quick
@@ -98,6 +107,12 @@ Item {
     Connections {
         target: generateButton
         onClicked: TesseractSetupWizard.onGenerateACM(slider.value)
+    }
+
+    Connections {
+        target: removeButton
+        onClicked: TesseractSetupWizard.onRemoveACMEntry(
+                       acmTableView.currentRow)
     }
 }
 

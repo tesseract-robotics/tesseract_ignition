@@ -32,13 +32,25 @@ namespace tesseract_ignition
          */
         Q_INVOKABLE void onLoad(const QString &urdf_filepath, const QString& srdf_filepath);
         Q_INVOKABLE void onAddChainGroup(const QString &group_name, const QString& base_link, const QString& tip_link);
-        Q_INVOKABLE void onAddJointGroup(const QString &group_name, const QStringList& joint_list);
-        Q_INVOKABLE void onAddLinkGroup(const QString &group_name, const QStringList& link_list);
+
+        Q_INVOKABLE void onAddJointGroup(const QString &group_name);
+        Q_INVOKABLE void onAddJointGroupJoint(const QString &joint_name);
+        Q_INVOKABLE void onRemoveJointGroupJoint(int index);
+
+        Q_INVOKABLE void onAddLinkGroup(const QString &group_name);
+        Q_INVOKABLE void onAddLinkGroupLink(const QString &link_name);
+        Q_INVOKABLE void onRemoveLinkGroupLink(int index);
+
+        Q_INVOKABLE void onRemoveKinematicGroup(int index);
+
         Q_INVOKABLE void onGenerateACM(long resolution);
+        Q_INVOKABLE void onRemoveACMEntry(int index);
+
         Q_INVOKABLE void onLoadJointGroup(const QString &group_name);
         Q_INVOKABLE void onJointValue(const QString &joint_name, double joint_value);
 
-
+        Q_INVOKABLE void onAddUserDefinedJointState(const QString &group_name, const QString &state_name);
+        Q_INVOKABLE void onRemoveUserDefinedJointState(int index);
 
       protected:
         Q_INVOKABLE void updateTesseract();

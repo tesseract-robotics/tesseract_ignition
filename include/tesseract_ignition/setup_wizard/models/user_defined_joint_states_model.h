@@ -35,6 +35,7 @@ public:
                        const QStringList &joint_values);
 
   QHash<int, QByteArray> roleNames() const override;
+  bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
 private:
   tesseract::Tesseract::Ptr thor_ {nullptr};

@@ -27,6 +27,10 @@
 
 Q_DECLARE_SMART_POINTER_METATYPE(std::shared_ptr);
 
+const QString CHAIN_GROUP = "Chain";
+const QString JOINT_LIST_GROUP = "Joint List";
+const QString LINK_LIST_GROUP = "Link List";
+
 namespace tesseract_ignition::gui::plugins
 {
 
@@ -74,6 +78,10 @@ class TesseractSetupWizardPrivate
   UserDefinedJointStatesModel user_joint_states_model;
 
   JointListModel joint_group_model;
+
+  QStringListModel group_link_list_model;
+
+  QStringListModel group_joint_list_model;
 };
 }
 
@@ -139,6 +147,8 @@ TesseractSetupWizard::TesseractSetupWizard()
   ignition::gui::App()->Engine()->rootContext()->setContextProperty("kinematicGroupsModel", &this->data_->kin_groups_model);
   ignition::gui::App()->Engine()->rootContext()->setContextProperty("userDefinedJointStatesModel", &this->data_->user_joint_states_model);
   ignition::gui::App()->Engine()->rootContext()->setContextProperty("jointGroupModel", &this->data_->joint_group_model);
+  ignition::gui::App()->Engine()->rootContext()->setContextProperty("linkListViewModel", &this->data_->group_link_list_model);
+  ignition::gui::App()->Engine()->rootContext()->setContextProperty("jointListViewModel", &this->data_->group_joint_list_model);
 }
 
 /////////////////////////////////////////////////
@@ -167,6 +177,16 @@ void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& s
 
   if (this->data_->thor->isInitialized())
   {
+    // Clear Models
+    this->data_->joint_model.clear();
+    this->data_->link_model.setStringList(QStringList());
+    this->data_->acm_model.clear();
+    this->data_->kin_groups_model.clear();
+    this->data_->group_link_list_model.setStringList(QStringList());
+    this->data_->group_joint_list_model.setStringList(QStringList());
+    this->data_->joint_group_model.clear();
+    this->data_->user_joint_states_model.clear();
+
     // Build link list model
     const std::vector<std::string>& link_names = this->data_->thor->getEnvironmentConst()->getLinkNames();
     QStringList links;
@@ -175,6 +195,7 @@ void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& s
       links.push_back(QString::fromStdString(link_name));
 
     this->data_->link_model.setStringList(links);
+    this->data_->link_model.sort(0);
 
     // Build Joint list model
     for (const auto& joint : this->data_->thor->getEnvironmentConst()->getSceneGraph()->getJoints())
@@ -184,6 +205,7 @@ void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& s
         this->data_->joint_model.add(joint);
       }
     }
+    this->data_->joint_model.sort(0);
 
     // Build ACM Model
     this->data_->acm_model.setEnvironment(this->data_->thor->getEnvironment());
@@ -201,23 +223,78 @@ void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& s
 void TesseractSetupWizard::onAddChainGroup(const QString &group_name, const QString& base_link, const QString& tip_link)
 {
   CONSOLE_BRIDGE_logError("onAddChainGroup");
+  QStringList list = {base_link, tip_link};
+  if (!group_name.isEmpty())
+    this->data_->kin_groups_model.add(group_name, CHAIN_GROUP, list);
 }
-void TesseractSetupWizard::onAddJointGroup(const QString &group_name, const QStringList& joint_list)
+
+void TesseractSetupWizard::onAddJointGroup(const QString &group_name)
 {
   CONSOLE_BRIDGE_logError("onAddJointGroup");
+  if (!group_name.isEmpty())
+    this->data_->kin_groups_model.add(group_name, JOINT_LIST_GROUP, this->data_->group_joint_list_model.stringList());
 }
-void TesseractSetupWizard::onAddLinkGroup(const QString &group_name, const QStringList& link_list)
+
+void TesseractSetupWizard::onAddJointGroupJoint(const QString &joint_name)
+{
+  CONSOLE_BRIDGE_logError("onAddJointGroup");
+  QStringList l = this->data_->group_joint_list_model.stringList();
+  if (!l.contains(joint_name) && !joint_name.isEmpty())
+  {
+    l.append(joint_name);
+    this->data_->group_joint_list_model.setStringList(l);
+  }
+}
+
+void TesseractSetupWizard::onRemoveJointGroupJoint(int index)
+{
+  CONSOLE_BRIDGE_logError("onRemoveJointGroupJoint");
+  this->data_->group_joint_list_model.removeRow(index);
+}
+
+void TesseractSetupWizard::onAddLinkGroup(const QString &group_name)
 {
   CONSOLE_BRIDGE_logError("onAddLinkGroup");
+  if (!group_name.isEmpty())
+    this->data_->kin_groups_model.add(group_name, LINK_LIST_GROUP, this->data_->group_link_list_model.stringList());
 }
+
+void TesseractSetupWizard::onAddLinkGroupLink(const QString &link_name)
+{
+  CONSOLE_BRIDGE_logError("onAddLinkGroupLink");
+  QStringList l = this->data_->group_link_list_model.stringList();
+  if (!l.contains(link_name) && !link_name.isEmpty())
+  {
+    l.append(link_name);
+    this->data_->group_link_list_model.setStringList(l);
+  }
+}
+
+void TesseractSetupWizard::onRemoveLinkGroupLink(int index)
+{
+  CONSOLE_BRIDGE_logError("onRemoveLinkGroupLink");
+  this->data_->group_link_list_model.removeRow(index);
+}
+
+void TesseractSetupWizard::onRemoveKinematicGroup(int index)
+{
+  CONSOLE_BRIDGE_logError("onRemoveKinematicGroup");
+  this->data_->kin_groups_model.removeRow(index);
+}
+
 void TesseractSetupWizard::onGenerateACM(long resolution)
 {
   CONSOLE_BRIDGE_logError("onGenerateACM");
 }
 
+void TesseractSetupWizard::onRemoveACMEntry(int index)
+{
+  CONSOLE_BRIDGE_logError("onRemoveACMEntry");
+  this->data_->acm_model.removeRow(index);
+}
+
 void TesseractSetupWizard::onLoadJointGroup(const QString &group_name)
 {
-
   this->data_->joint_group_model.clear();
   auto kin = this->data_->thor->getFwdKinematicsManagerConst()->getFwdKinematicSolver(group_name.toStdString());
   if (kin != nullptr)
@@ -227,9 +304,43 @@ void TesseractSetupWizard::onLoadJointGroup(const QString &group_name)
 
 void TesseractSetupWizard::onJointValue(const QString &joint_name, double joint_value)
 {
+  CONSOLE_BRIDGE_logError("onJointValue");
+  for (int i = 0; i < this->data_->joint_group_model.rowCount(); ++i)
+  {
+    QStandardItem* item = this->data_->joint_group_model.item(i);
+    if (item->data(this->data_->joint_group_model.NameRole).toString() == joint_name)
+    {
+      item->setData(QString::number(joint_value), this->data_->joint_group_model.ValueRole);
+      break;
+    }
+  }
   this->data_->thor->getEnvironment()->setState({joint_name.toStdString()}, {joint_value});
   this->data_->update_transforms = true;
 }
+
+void TesseractSetupWizard::onAddUserDefinedJointState(const QString &group_name, const QString &state_name)
+{
+  CONSOLE_BRIDGE_logError("onAddUserDefinedJointState");
+  if (!group_name.isEmpty() && !state_name.isEmpty())
+  {
+    QStringList joint_names;
+    QStringList joint_values;
+    for (int i = 0; i < this->data_->joint_group_model.rowCount(); ++i)
+    {
+      QStandardItem* item = this->data_->joint_group_model.item(i);
+      joint_names.push_back(item->data(this->data_->joint_group_model.NameRole).toString());
+      joint_values.push_back(item->data(this->data_->joint_group_model.ValueRole).toString());
+    }
+    this->data_->user_joint_states_model.add(group_name, state_name, joint_names, joint_values);
+  }
+}
+
+void TesseractSetupWizard::onRemoveUserDefinedJointState(int index)
+{
+  CONSOLE_BRIDGE_logError("onRemoveUserDefinedJointState");
+  this->data_->user_joint_states_model.removeRow(index);
+}
+
 
 bool TesseractSetupWizard::eventFilter(QObject *_obj, QEvent *_event)
 {

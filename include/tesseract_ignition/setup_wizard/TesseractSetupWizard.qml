@@ -137,7 +137,7 @@ Item {
             Loader {
                 id: loadPageLoader
                 anchors.fill: parent
-                source: "qrc:/TesseractSetupWizard/qml/LoadSetupWizardFiles.qml";
+                source: "qrc:/TesseractSetupWizard/LoadSetupWizardFiles.qml";
             }
         }
 
@@ -154,7 +154,7 @@ Item {
             Loader {
                 id: acmPageLoader
                 anchors.fill: parent
-                source: "qrc:/TesseractSetupWizard/qml/AllowedCollisionEditor.qml"
+                source: "qrc:/TesseractSetupWizard/AllowedCollisionEditor.qml"
                 onLoaded: {
                     item.setAllowedCollisionMatrixModel(acmModel);
                 }
@@ -174,11 +174,13 @@ Item {
             Loader {
                 id: kinGroupsPageLoader
                 anchors.fill: parent
-                source: "qrc:/TesseractSetupWizard/qml/KinematicGroups.qml"
+                source: "qrc:/TesseractSetupWizard/KinematicGroups.qml"
                 onLoaded: {
                     item.setLinkModel(linkModel);
                     item.setJointModel(jointModel);
                     item.setKinematicGroupsModel(kinematicGroupsModel);
+                    item.setLinkListViewModel(linkListViewModel)
+                    item.setJointListViewModel(jointListViewModel)
                 }
             }
         }
@@ -196,7 +198,7 @@ Item {
             Loader {
                 id: userDefinedStatesPageLoader
                 anchors.fill: parent
-                source: "qrc:/TesseractSetupWizard/qml/UserDefinedJointStates.qml"
+                source: "qrc:/TesseractSetupWizard/UserDefinedJointStates.qml"
                 onLoaded: {
                     item.setUserDefinedStatesModel(userDefinedJointStatesModel);
                     item.setJointGroupsModel(jointGroupModel);

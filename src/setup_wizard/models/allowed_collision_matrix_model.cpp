@@ -30,6 +30,7 @@ QHash<int, QByteArray> AllowedCollisionMatrixModel::roleNames() const
 
 void AllowedCollisionMatrixModel::setEnvironment(tesseract_environment::Environment::Ptr env)
 {
+  this->clear();
   env_ = env;
   QStandardItem *parent_item = this->invisibleRootItem();
   for (const auto& ac : env_->getAllowedCollisionMatrix()->getAllAllowedCollisions())
@@ -41,6 +42,7 @@ void AllowedCollisionMatrixModel::setEnvironment(tesseract_environment::Environm
     parent_item->appendRow(item);
   }
 }
+
 void AllowedCollisionMatrixModel::add(const QString& link_name1, const QString& link_name2, const QString& reason)
 {
   env_->addAllowedCollision(link_name1.toStdString(), link_name2.toStdString(), reason.toStdString());

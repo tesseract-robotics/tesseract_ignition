@@ -31,6 +31,7 @@ QHash<int, QByteArray> UserDefinedJointStatesModel::roleNames() const
 
 void UserDefinedJointStatesModel::setTesseract(tesseract::Tesseract::Ptr thor)
 {
+  this->clear();
   thor_ = thor;
   QStandardItem *parent_item = this->invisibleRootItem();
   for (const auto& group : thor_->getUserDefinedGroupStatesConst())
@@ -100,6 +101,19 @@ void UserDefinedJointStatesModel::add(const QString& group_name,
 //    QStandardItem *replace = findChild<QStandardItem*>(group_name);
   }
 
+}
+
+bool UserDefinedJointStatesModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+  QStandardItem *row_item = item(row);
+  QString group_name = row_item->data(this->GroupNameRole).toString();
+  QString state_name = row_item->data(this->StateNameRole).toString();
+  auto& group_states = thor_->getUserDefinedGroupStates();
+  group_states[group_name.toStdString()].erase(state_name.toStdString());
+  if (group_states[group_name.toStdString()].empty())
+    group_states.erase(group_name.toStdString());
+
+  return QStandardItemModel::removeRows(row, count, parent);
 }
 
 }
