@@ -30,7 +30,7 @@ QHash<int, QByteArray> AllowedCollisionMatrixModel::roleNames() const
 
 void AllowedCollisionMatrixModel::setEnvironment(tesseract_environment::Environment::Ptr env)
 {
-  this->clear();
+  QStandardItemModel::clear();
   env_ = env;
   QStandardItem *parent_item = this->invisibleRootItem();
   for (const auto& ac : env_->getAllowedCollisionMatrix()->getAllAllowedCollisions())
@@ -41,6 +41,7 @@ void AllowedCollisionMatrixModel::setEnvironment(tesseract_environment::Environm
     item->setData(QString::fromStdString(ac.second), this->roleNames().key("reason"));
     parent_item->appendRow(item);
   }
+  sort(0);
 }
 
 void AllowedCollisionMatrixModel::add(const QString& link_name1, const QString& link_name2, const QString& reason)
@@ -52,6 +53,18 @@ void AllowedCollisionMatrixModel::add(const QString& link_name1, const QString& 
   item->setData(link_name2, this->roleNames().key("link2"));
   item->setData(reason, this->roleNames().key("reason"));
   parent_item->appendRow(item);
+  sort(0);
+}
+
+void AllowedCollisionMatrixModel::clear()
+{
+  QStandardItemModel::clear();
+  if (env_)
+  {
+    tesseract_scene_graph::AllowedCollisionMatrix acm(*env_->getAllowedCollisionMatrix());
+    for (const auto& entry : acm.getAllAllowedCollisions())
+      env_->removeAllowedCollision(entry.first.first, entry.first.second);
+  }
 }
 
 }

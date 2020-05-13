@@ -34,45 +34,46 @@ void KinematicGroupsModel::setTesseract(tesseract::Tesseract::Ptr thor)
 
   thor_ = thor;
   QStandardItem *parent_item = this->invisibleRootItem();
-  for (const auto& group : thor_->getSRDFModelConst()->getGroups())
+  for (const auto& group : thor_->getSRDFModelConst()->getChainGroups())
   {
-    if (!group.chains_.empty())
+    if (!group.second.empty())
     {
       auto item = new QStandardItem();
-      item->setData(QString::fromStdString(group.name_), this->roleNames().key("name"));
+      item->setData(QString::fromStdString(group.first), this->roleNames().key("name"));
       item->setData(QString::fromStdString("Chain"), this->roleNames().key("type"));
-      QString data = QString::fromStdString(group.chains_[0].first) + "," + QString::fromStdString(group.chains_[0].second);
+      QString data = QString::fromStdString(group.second[0].first) + "," + QString::fromStdString(group.second[0].second);
       item->setData(data, this->roleNames().key("data"));
       parent_item->appendRow(item);
     }
+  }
 
-    if (!group.joints_.empty())
+  for (const auto& group : thor_->getSRDFModelConst()->getJointGroups())
+  {
+    if (!group.second.empty())
     {
       auto item = new QStandardItem();
-      item->setData(QString::fromStdString(group.name_), this->roleNames().key("name"));
+      item->setData(QString::fromStdString(group.first), this->roleNames().key("name"));
       item->setData(QString::fromStdString("Joint List"), this->roleNames().key("type"));
-      QString data = QString::fromStdString(group.joints_[0]);
-      for (std::size_t i = 1; i < group.joints_.size(); ++i)
-        data += ("," + QString::fromStdString(group.joints_[i]));
+      QString data = QString::fromStdString(group.second[0]);
+      for (std::size_t i = 1; i < group.second.size(); ++i)
+        data += ("," + QString::fromStdString(group.second[i]));
       item->setData(data, this->roleNames().key("data"));
       parent_item->appendRow(item);
     }
+  }
 
-    if (!group.links_.empty())
+  for (const auto& group : thor_->getSRDFModelConst()->getLinkGroups())
+  {
+    if (!group.second.empty())
     {
       auto item = new QStandardItem();
-      item->setData(QString::fromStdString(group.name_), this->roleNames().key("name"));
+      item->setData(QString::fromStdString(group.first), this->roleNames().key("name"));
       item->setData(QString::fromStdString("Link List"), this->roleNames().key("type"));
-      QString data = QString::fromStdString(group.links_[0]);
-      for (std::size_t i = 1; i < group.links_.size(); ++i)
-        data += ("," + QString::fromStdString(group.links_[i]));
+      QString data = QString::fromStdString(group.second[0]);
+      for (std::size_t i = 1; i < group.second.size(); ++i)
+        data += ("," + QString::fromStdString(group.second[i]));
       item->setData(data, this->roleNames().key("data"));
       parent_item->appendRow(item);
-    }
-
-    if (!group.subgroups_.empty())
-    {
-      CONSOLE_BRIDGE_logError("Subgroups are currently not supported!");
     }
   }
 }
@@ -88,10 +89,6 @@ void KinematicGroupsModel::add(const QString& group_name, const QString& type, c
       auto fwd_kin = factory->create(this->thor_->getEnvironmentConst()->getSceneGraph(), data[0].toStdString(), data[1].toStdString(), group_name.toStdString());
       if (fwd_kin != nullptr && this->thor_->getFwdKinematicsManager()->addFwdKinematicSolver(fwd_kin))
       {
-        tesseract_scene_graph::SRDFModel::Group g;
-        g.name_ = group_name.toStdString();
-        g.chains_.push_back(std::make_pair(data[0].toStdString(), data[1].toStdString()));
-
         auto item = new QStandardItem();
         item->setData(group_name, this->roleNames().key("name"));
         item->setData("Chain", this->roleNames().key("type"));
@@ -114,11 +111,6 @@ void KinematicGroupsModel::add(const QString& group_name, const QString& type, c
       auto fwd_kin = factory->create(this->thor_->getEnvironmentConst()->getSceneGraph(), joints, group_name.toStdString());
       if (fwd_kin != nullptr && this->thor_->getFwdKinematicsManager()->addFwdKinematicSolver(fwd_kin))
       {
-        tesseract_scene_graph::SRDFModel::Group g;
-        g.name_ = group_name.toStdString();
-        for (const auto& s : data)
-          g.joints_.push_back(s.toStdString());
-
         auto item = new QStandardItem();
         item->setData(group_name, this->roleNames().key("name"));
         item->setData("Joint List", this->roleNames().key("type"));
@@ -132,11 +124,6 @@ void KinematicGroupsModel::add(const QString& group_name, const QString& type, c
   }
   else if (type == "Link List")
   {
-    tesseract_scene_graph::SRDFModel::Group g;
-    g.name_ = group_name.toStdString();
-    for (const auto& s : data)
-      g.links_.push_back(s.toStdString());
-
     auto item = new QStandardItem();
     item->setData(group_name, this->roleNames().key("name"));
     item->setData("Link List", this->roleNames().key("type"));

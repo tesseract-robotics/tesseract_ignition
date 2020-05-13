@@ -26,6 +26,7 @@ public:
 
   Q_INVOKABLE void setEnvironment(tesseract_environment::Environment::Ptr env);
   Q_INVOKABLE void add(const QString& link_name1, const QString& link_name2, const QString& reason);
+  Q_INVOKABLE void clear();
 
   QHash<int, QByteArray> roleNames() const override;
 

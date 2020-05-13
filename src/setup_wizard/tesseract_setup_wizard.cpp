@@ -285,6 +285,64 @@ void TesseractSetupWizard::onRemoveKinematicGroup(int index)
 void TesseractSetupWizard::onGenerateACM(long resolution)
 {
   CONSOLE_BRIDGE_logError("onGenerateACM");
+  auto& env = this->data_->thor->getEnvironment();
+  auto contact_manager = env->getDiscreteContactManager();
+  auto state_solver = env->getStateSolver();
+
+  // We want to disable the allowed contact function for this process so it is set null
+  contact_manager->setIsContactAllowedFn(nullptr);
+  tesseract_collision::ContactResultMap results;
+  tesseract_collision::ContactRequest request;
+  request.type = tesseract_collision::ContactTestType::ALL;
+
+  for (long i = 0; i < resolution; ++i)
+  {
+    tesseract_environment::EnvState::Ptr state = state_solver->getRandomState();
+    contact_manager->contactTest(results, request);
+  }
+
+  this->data_->acm_model.clear();
+  for (const auto& pair : results)
+  {
+    double percent = double(pair.second.size()) / double(resolution);
+    if (percent > 0.95)
+    {
+      std::vector<std::string> adj_first = env->getSceneGraph()->getAdjacentLinkNames(pair.first.first);
+      std::vector<std::string> adj_second = env->getSceneGraph()->getAdjacentLinkNames(pair.first.second);
+      if (std::find(adj_first.begin(), adj_first.end(), pair.first.second) != adj_first.end())
+      {
+        env->addAllowedCollision(pair.first.first, pair.first.second, "Adjacent");
+      }
+      else if (std::find(adj_second.begin(), adj_second.end(), pair.first.first) != adj_second.end())
+      {
+        env->addAllowedCollision(pair.first.second, pair.first.first, "Adjacent");
+      }
+      else
+      {
+        env->addAllowedCollision(pair.first.second, pair.first.first, "Allways");
+      }
+    }
+  }
+
+  std::vector<std::string> link_names = env->getLinkNames();
+  for (std::size_t i = 0; i < link_names.size() - 1; ++i)
+  {
+    const auto& link1 = env->getLink(link_names[i]);
+    if (link1->collision.empty())
+      continue;
+
+    for (std::size_t j = i + 1; j < link_names.size(); ++j)
+    {
+      const auto& link2 = env->getLink(link_names[j]);
+      if (link2->collision.empty())
+        continue;
+
+      if (results.find(tesseract_collision::getObjectPairKey(link_names[i], link_names[j])) == results.end())
+        env->addAllowedCollision(link_names[i], link_names[j], "Never");
+    }
+  }
+
+  this->data_->acm_model.setEnvironment(env);
 }
 
 void TesseractSetupWizard::onRemoveACMEntry(int index)

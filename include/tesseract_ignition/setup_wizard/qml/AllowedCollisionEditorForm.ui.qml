@@ -14,6 +14,9 @@ Item {
 
     Slider {
         id: slider
+        from: 1000
+        value: 8000
+        to: 10000
         anchors.right: generateButton.left
         anchors.rightMargin: 5
         anchors.left: label.right
@@ -51,7 +54,7 @@ Item {
         frameVisible: true
         anchors.bottom: removeButton.top
         anchors.bottomMargin: 6
-        sortIndicatorColumn: 1
+        sortIndicatorColumn: 0
         sortIndicatorVisible: true
         backgroundVisible: true
         anchors.right: parent.right
@@ -61,6 +64,7 @@ Item {
         anchors.top: slider.bottom
         anchors.topMargin: 10
         model: acmModel
+        onModelChanged: busyIndicator.running = false
 
         QC1.TableViewColumn {
             id: link1Column
