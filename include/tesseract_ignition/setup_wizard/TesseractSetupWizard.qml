@@ -5,6 +5,8 @@ import "qrc:/TesseractSetupWizard/qml"
 
 Item {
     id: tsw
+    Layout.minimumWidth: 400
+    Layout.minimumHeight: 600
     anchors.fill: parent
 
     ToolBar {
@@ -23,14 +25,6 @@ Item {
                 }
             }
 
-            ToolButton {
-                text: qsTr("‹")
-                onClicked: wizardDrawer.close()
-            }
-            ToolButton {
-                text: qsTr("›")
-                onClicked: wizardDrawer.open()
-            }
             Label {
                 text: "Tesseract Setup Wizard"
                 elide: Label.ElideRight
@@ -50,10 +44,9 @@ Item {
         visible: false
 
         y: overlayHeader.height
-        x: parent.x
 
-        width: (tsw.width / 4) > 300 ? 300 : (tsw.width / 4)
-        height: tsw.height - overlayHeader.height
+        width: (parent.width / 4) > 300 ? 300 : (parent.width / 4)
+        height: tsw.height
 
         ListView {
             id: drawerListView
@@ -115,6 +108,12 @@ Item {
 
             ScrollIndicator.vertical: ScrollIndicator { }
 
+        }
+        Connections{
+            target: wizardSwipeView
+            onCurrentIndexChanged: {
+                drawerListView.currentIndex = wizardSwipeView.currentIndex
+            }
         }
     }
 

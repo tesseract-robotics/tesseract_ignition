@@ -9,10 +9,11 @@ Item {
     property alias srdfBrowseButton: srdfBrowseButton
     property alias urdfTextField: urdfTextField
     property alias urdfBrowseButton: urdfBrowseButton
+    property alias saveSRDFButton: saveSRDFButton
 
     Label {
         id: urdfLabel
-        width: 65
+        width: 100
         height: 30
         text: qsTr("URDF File:")
         verticalAlignment: Text.AlignVCenter
@@ -59,7 +60,7 @@ Item {
         id: srdfLabel
         x: -9
         y: -9
-        width: 65
+        width: 100
         height: 30
         text: qsTr("SRDF File:")
         verticalAlignment: Text.AlignVCenter
@@ -123,12 +124,25 @@ Item {
         onClicked: TesseractSetupWizard.onLoad(urdfTextField.text,
                                                srdfTextField.text)
     }
+
+    Button {
+        id: saveSRDFButton
+        y: 136
+        width: 100
+        height: 50
+        text: qsTr("Save")
+        anchors.verticalCenter: loadButton.verticalCenter
+        anchors.left: parent.left
+        anchors.leftMargin: 10
+    }
 }
 
 
 
 
+
+
 /*##^## Designer {
-    D{i:0;autoSize:true;height:480;width:640}
+    D{i:0;autoSize:true;height:480;width:640}D{i:9;anchors_x:8;anchors_y:136}
 }
  ##^##*/

@@ -44,7 +44,7 @@ void TesseractIgnitionVisualization::plotTrajectory(const std::vector<std::strin
 {
   tesseract_environment::StateSolver::Ptr state_solver = env_->getStateSolver();
 
-  std::chrono::duration<double> fp_s(1.0/traj.rows());
+  std::chrono::duration<double> fp_s(1.0/static_cast<double>(traj.rows()));
   for (long i = 0; i < traj.rows(); ++i)
   {
     ignition::msgs::Pose_V pose_v;
@@ -71,7 +71,7 @@ void addArrow(EntityManager& entity_manager,
               const std::string& parent_name,
               const Eigen::Ref<const Eigen::Vector3d>& pt1,
               const Eigen::Ref<const Eigen::Vector3d>& pt2,
-              const Eigen::Ref<const Eigen::Vector4d>& rgba,
+              const Eigen::Ref<const Eigen::Vector4d>& /*rgba*/,
               double radius)
 {
   std::string gv_name = parent_name + "_" + std::to_string(++sub_index);
@@ -116,7 +116,7 @@ void addCylinder(EntityManager& entity_manager,
                  const std::string& parent_name,
                  const Eigen::Ref<const Eigen::Vector3d>& pt1,
                  const Eigen::Ref<const Eigen::Vector3d>& pt2,
-                 const Eigen::Ref<const Eigen::Vector4d>& rgba,
+                 const Eigen::Ref<const Eigen::Vector4d>& /*rgba*/,
                  double radius)
 {
   std::string gv_name = parent_name + "_" + std::to_string(++sub_index);

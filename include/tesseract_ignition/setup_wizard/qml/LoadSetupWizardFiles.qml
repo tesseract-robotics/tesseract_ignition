@@ -37,6 +37,21 @@ FileDialog{
     }
 }
 
+FileDialog{
+    id: srdfSaveFileDialog;
+    title: "Please choose a SRDF file";
+    folder: shortcuts.home
+    nameFilters: ["SRDF Files (*.srdf)"];
+    selectFolder: false
+    selectMultiple: false
+    selectExisting: false
+    onAccepted: {
+        console.info("User has selected SRDF to save:" + srdfSaveFileDialog.fileUrl);
+        srdfFileDialog.close();
+        TesseractSetupWizard.onSave(srdfSaveFileDialog.fileUrl.toString());
+    }
+}
+
 LoadSetupWizardFilesForm {
     id: loadSetupWizardFiles;
     Layout.fillHeight: true;
@@ -50,6 +65,11 @@ LoadSetupWizardFilesForm {
     srdfBrowseButton.onClicked: {
         console.info("SRDF browser button selected");
         srdfFileDialog.open();
+    }
+
+    saveSRDFButton.onClicked: {
+        console.info("SRDF save button selected");
+        srdfSaveFileDialog.open();
     }
 }
 }

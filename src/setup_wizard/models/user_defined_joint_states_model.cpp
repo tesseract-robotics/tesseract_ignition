@@ -98,9 +98,8 @@ void UserDefinedJointStatesModel::add(const QString& group_name,
   }
   else // replace
   {
-//    QStandardItem *replace = findChild<QStandardItem*>(group_name);
+    setTesseract(thor_);
   }
-
 }
 
 bool UserDefinedJointStatesModel::removeRows(int row, int count, const QModelIndex &parent)

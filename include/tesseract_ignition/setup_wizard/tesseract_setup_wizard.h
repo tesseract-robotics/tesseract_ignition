@@ -31,6 +31,7 @@ namespace tesseract_ignition
          * @param[in] _srdf_filepath The srdf file path.
          */
         Q_INVOKABLE void onLoad(const QString &urdf_filepath, const QString& srdf_filepath);
+        Q_INVOKABLE void onSave(const QString& srdf_filepath);
         Q_INVOKABLE void onAddChainGroup(const QString &group_name, const QString& base_link, const QString& tip_link);
 
         Q_INVOKABLE void onAddJointGroup(const QString &group_name);
@@ -54,6 +55,9 @@ namespace tesseract_ignition
 
       protected:
         Q_INVOKABLE void updateTesseract();
+        Q_INVOKABLE void removeGroupStates(const QString& group_name);
+        Q_INVOKABLE void removeGroupTCPs(const QString& group_name);
+
 
         /** @brief Used to filter scroll wheel events.
           * @param[in] _o Object that receives the event.
