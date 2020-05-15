@@ -15,6 +15,7 @@
 #include <tesseract_ignition/setup_wizard/models/allowed_collision_matrix_model.h>
 #include <tesseract_ignition/setup_wizard/models/kinematic_groups_model.h>
 #include <tesseract_ignition/setup_wizard/models/user_defined_joint_states_model.h>
+#include <tesseract_ignition/setup_wizard/models/user_defined_tcp_model.h>
 #include <tesseract_ignition/gui_events.h>
 #include <tesseract_ignition/entity_manager.h>
 #include <tesseract_ignition/conversions.h>
@@ -24,12 +25,15 @@
 #include <tesseract_environment/kdl/kdl_env.h>
 #include <memory>
 #include <QMetaObject>
+#include <boost/algorithm/string/split.hpp>
 
 Q_DECLARE_SMART_POINTER_METATYPE(std::shared_ptr);
 
 const QString CHAIN_GROUP = "Chain";
 const QString JOINT_LIST_GROUP = "Joint List";
 const QString LINK_LIST_GROUP = "Link List";
+
+static std::unordered_map<std::string, std::string> cache_package_paths;
 
 namespace tesseract_ignition::gui::plugins
 {
@@ -77,6 +81,8 @@ class TesseractSetupWizardPrivate
 
   UserDefinedJointStatesModel user_joint_states_model;
 
+  UserDefinedTCPModel user_tcp_model;
+
   JointListModel joint_group_model;
 
   QStringListModel group_link_list_model;
@@ -117,6 +123,37 @@ std::string locateResource(const std::string& url)
       return std::string();
     }
   }
+  else if (url.find("package://") == 0)
+  {
+    mod_url.erase(0, strlen("package://"));
+    size_t pos = mod_url.find('/');
+    if (pos == std::string::npos)
+    {
+      return std::string();
+    }
+
+    std::string package = mod_url.substr(0, pos);
+    mod_url.erase(0, pos);
+
+    if (cache_package_paths.empty())
+    {
+      char* ros_package_paths = std::getenv("ROS_PACKAGE_PATH");
+      std::vector<std::string> tokens;
+      boost::split(tokens, ros_package_paths, boost::is_any_of(":"), boost::token_compress_on);
+      for (const auto& token : tokens)
+      {
+        QDir d(QString::fromStdString(token));
+        if (d.exists())
+          cache_package_paths[d.dirName().toStdString()] = token;
+      }
+    }
+    auto find_package = cache_package_paths.find(package);
+
+    if (find_package != cache_package_paths.end())
+      mod_url = find_package->second + mod_url;
+    else
+      return std::string();
+  }
 
   return mod_url;
 }
@@ -146,6 +183,7 @@ TesseractSetupWizard::TesseractSetupWizard()
   ignition::gui::App()->Engine()->rootContext()->setContextProperty("acmModel", &this->data_->acm_model);
   ignition::gui::App()->Engine()->rootContext()->setContextProperty("kinematicGroupsModel", &this->data_->kin_groups_model);
   ignition::gui::App()->Engine()->rootContext()->setContextProperty("userDefinedJointStatesModel", &this->data_->user_joint_states_model);
+  ignition::gui::App()->Engine()->rootContext()->setContextProperty("userDefinedTCPModel", &this->data_->user_tcp_model);
   ignition::gui::App()->Engine()->rootContext()->setContextProperty("jointGroupModel", &this->data_->joint_group_model);
   ignition::gui::App()->Engine()->rootContext()->setContextProperty("linkListViewModel", &this->data_->group_link_list_model);
   ignition::gui::App()->Engine()->rootContext()->setContextProperty("jointListViewModel", &this->data_->group_joint_list_model);
@@ -193,6 +231,7 @@ void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& s
     this->data_->group_joint_list_model.setStringList(QStringList());
     this->data_->joint_group_model.clear();
     this->data_->user_joint_states_model.clear();
+    this->data_->user_tcp_model.clear();
 
     // Build link list model
     const std::vector<std::string>& link_names = this->data_->thor->getEnvironmentConst()->getLinkNames();
@@ -222,6 +261,9 @@ void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& s
 
     // Build Groups Joint States Model
     this->data_->user_joint_states_model.setTesseract(this->data_->thor);
+
+    // Build Groups TCPs Model
+    this->data_->user_tcp_model.setTesseract(this->data_->thor);
   }
 
   this->data_->load_environment = true;
@@ -238,9 +280,9 @@ void TesseractSetupWizard::onAddChainGroup(const QString &group_name, const QStr
   CONSOLE_BRIDGE_logError("onAddChainGroup");
   QStringList list = {base_link, tip_link};
   std::vector<std::string> groups = this->data_->thor->getFwdKinematicsManager()->getAvailableFwdKinematicsManipulators();
+  this->data_->kin_groups_model.add(group_name, CHAIN_GROUP, list);
   if (!group_name.isEmpty())
   {
-    this->data_->kin_groups_model.add(group_name, CHAIN_GROUP, list);
     if (std::find(groups.begin(), groups.end(), group_name.toStdString()) != groups.end())
     {
       // The manipulator was replace so remove its group states and tcps
@@ -254,9 +296,9 @@ void TesseractSetupWizard::onAddJointGroup(const QString &group_name)
 {
   CONSOLE_BRIDGE_logError("onAddJointGroup");
   std::vector<std::string> groups = this->data_->thor->getFwdKinematicsManager()->getAvailableFwdKinematicsManipulators();
+  this->data_->kin_groups_model.add(group_name, JOINT_LIST_GROUP, this->data_->group_joint_list_model.stringList());
   if (!group_name.isEmpty())
   {
-    this->data_->kin_groups_model.add(group_name, JOINT_LIST_GROUP, this->data_->group_joint_list_model.stringList());
     if (std::find(groups.begin(), groups.end(), group_name.toStdString()) != groups.end())
     {
       // The manipulator was replace so remove its group states and tcps
@@ -270,9 +312,9 @@ void TesseractSetupWizard::onAddLinkGroup(const QString &group_name)
 {
   CONSOLE_BRIDGE_logError("onAddLinkGroup");
   std::vector<std::string> groups = this->data_->thor->getFwdKinematicsManager()->getAvailableFwdKinematicsManipulators();
+  this->data_->kin_groups_model.add(group_name, LINK_LIST_GROUP, this->data_->group_link_list_model.stringList());
   if (!group_name.isEmpty())
   {
-    this->data_->kin_groups_model.add(group_name, LINK_LIST_GROUP, this->data_->group_link_list_model.stringList());
     if (std::find(groups.begin(), groups.end(), group_name.toStdString()) != groups.end())
     {
       // The manipulator was replace so remove its group states and tcps
@@ -319,12 +361,16 @@ void TesseractSetupWizard::onRemoveLinkGroupLink(int index)
 void TesseractSetupWizard::onRemoveKinematicGroup(int index)
 {
   CONSOLE_BRIDGE_logError("onRemoveKinematicGroup");
-  QString group_name = this->data_->kin_groups_model.item(index, 0)->data(this->data_->kin_groups_model.NameRole).toString();
-  this->data_->kin_groups_model.removeRow(index);
-
-  // Remove Group States and TCPs associated with the group
-  removeGroupStates(group_name);
-  removeGroupTCPs(group_name);
+  if (index >= 0)
+  {
+    QString group_name = this->data_->kin_groups_model.item(index, 0)->data(this->data_->kin_groups_model.NameRole).toString();
+    if (this->data_->kin_groups_model.removeRow(index))
+    {
+      // Remove Group States and TCPs associated with the group
+      removeGroupStates(group_name);
+      removeGroupTCPs(group_name);
+    }
+  }
 }
 
 void TesseractSetupWizard::onGenerateACM(long resolution)
@@ -451,6 +497,22 @@ void TesseractSetupWizard::onRemoveUserDefinedJointState(int index)
   this->data_->user_joint_states_model.removeRow(index);
 }
 
+void TesseractSetupWizard::onAddUserDefinedTCP(const QString &group_name,
+                                               const QString &tcp_name,
+                                               const QVector3D& position,
+                                               const QVector3D& orientation)
+{
+  CONSOLE_BRIDGE_logError("onAddUserDefinedTCP");
+  if (!group_name.isEmpty() && !tcp_name.isEmpty())
+    this->data_->user_tcp_model.add(group_name, tcp_name, position, orientation);
+
+}
+
+void TesseractSetupWizard::onRemoveUserDefinedTCP(int index)
+{
+  CONSOLE_BRIDGE_logError("onRemoveUserDefinedTCP");
+  this->data_->user_tcp_model.removeRow(index);
+}
 
 bool TesseractSetupWizard::eventFilter(QObject *_obj, QEvent *_event)
 {
@@ -539,7 +601,9 @@ void TesseractSetupWizard::removeGroupStates(const QString& group_name)
 
 void TesseractSetupWizard::removeGroupTCPs(const QString& group_name)
 {
-
+  auto matches = this->data_->user_tcp_model.match(this->data_->user_tcp_model.index(0, 0), this->data_->user_tcp_model.GroupNameRole, group_name, 1, Qt::MatchExactly);
+  if (!matches.empty())
+    this->data_->user_tcp_model.removeRows(matches[0].row(), 1);
 }
 
 // Register this plugin

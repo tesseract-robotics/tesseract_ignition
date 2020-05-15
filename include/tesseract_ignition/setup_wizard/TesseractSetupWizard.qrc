@@ -8,6 +8,10 @@
     <file>qml/LoadSetupWizardFilesForm.ui.qml</file>
     <file>qml/UserDefinedJointStates.qml</file>
     <file>qml/UserDefinedJointStatesForm.ui.qml</file>
+    <file>qml/UserDefinedToolCenterPoints.qml</file>
+    <file>qml/UserDefinedToolCenterPointsForm.ui.qml</file>
+    <file>qml/OPWKinematicsDefinition.qml</file>
+    <file>qml/OPWKinematicsDefinitionForm.ui.qml</file>
     <file>TesseractSetupWizard.qml</file>
     <file>logo.png</file>
   </qresource>

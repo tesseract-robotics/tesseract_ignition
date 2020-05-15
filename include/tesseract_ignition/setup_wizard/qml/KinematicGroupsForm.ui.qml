@@ -9,7 +9,6 @@ import QtQuick.Controls.Styles 1.4
 Item {
     id: element
     anchors.fill: parent
-    width: 400
 
     // Exposed objects
     property alias removeGroupButton: removeGroupButton
@@ -31,9 +30,9 @@ Item {
     property alias addLinkButton: addLinkButton
     property alias linkGroupAddButton: linkGroupAddButton
 
-    Frame {
+    Item {
         id: frame
-        padding: 0
+        visible: true
         anchors.fill: parent
 
         TabBar {
@@ -389,3 +388,11 @@ Item {
         }
     }
 }
+
+
+
+
+/*##^## Designer {
+    D{i:0;autoSize:true;height:480;width:640}
+}
+ ##^##*/

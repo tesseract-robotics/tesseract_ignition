@@ -34,14 +34,14 @@ void UserDefinedJointStatesModel::setTesseract(tesseract::Tesseract::Ptr thor)
   this->clear();
   thor_ = thor;
   QStandardItem *parent_item = this->invisibleRootItem();
-  for (const auto& group : thor_->getUserDefinedGroupStatesConst())
+  for (const auto& group : thor_->getGroupStatesConst())
   {
     for (const auto& state : group.second)
     {
 
       auto item = new QStandardItem();
-      item->setData(QString::fromStdString(group.first), this->roleNames().key("group_name"));
-      item->setData(QString::fromStdString(state.first), this->roleNames().key("state_name"));
+      item->setData(QString::fromStdString(group.first), UserDefinedJointStatesRoles::GroupNameRole);
+      item->setData(QString::fromStdString(state.first), UserDefinedJointStatesRoles::StateNameRole);
 
       QStringList joint_names;
       QStringList joint_values;
@@ -51,8 +51,8 @@ void UserDefinedJointStatesModel::setTesseract(tesseract::Tesseract::Ptr thor)
         joint_values.push_back(QString::number(v.second));
       }
 
-      item->setData(joint_names.join(","), this->roleNames().key("joint_names"));
-      item->setData(joint_values.join(","), this->roleNames().key("joint_values"));
+      item->setData(joint_names.join(","), UserDefinedJointStatesRoles::JointNamesRole);
+      item->setData(joint_values.join(","), UserDefinedJointStatesRoles::JointValuesRole);
       parent_item->appendRow(item);
     }
   }
@@ -63,7 +63,9 @@ void UserDefinedJointStatesModel::add(const QString& group_name,
                                       const QStringList& joint_names,
                                       const QStringList& joint_values)
 {
-  auto& group_states = thor_->getUserDefinedGroupStates();
+  QString state_name_trimmed = state_name.trimmed();
+
+  auto& group_states = thor_->getGroupStates();
   auto group = group_states.find(group_name.toStdString());
   bool add = true;
 
@@ -73,11 +75,11 @@ void UserDefinedJointStatesModel::add(const QString& group_name,
 
   if (group != group_states.end())
   {
-    auto s = group->second.find(state_name.toStdString());
+    auto s = group->second.find(state_name_trimmed.toStdString());
     if (s != group->second.end())
       add = false;
 
-    group->second[state_name.toStdString()] = state;
+    group->second[state_name_trimmed.toStdString()] = state;
   }
   else
   {
@@ -90,10 +92,10 @@ void UserDefinedJointStatesModel::add(const QString& group_name,
   if (add)
   {
     auto item = new QStandardItem();
-    item->setData(group_name, this->roleNames().key("group_name"));
-    item->setData(state_name, this->roleNames().key("state_name"));
-    item->setData(joint_names.join(","), this->roleNames().key("joint_names"));
-    item->setData(joint_values.join(","), this->roleNames().key("joint_values"));
+    item->setData(group_name, UserDefinedJointStatesRoles::GroupNameRole );
+    item->setData(state_name_trimmed, UserDefinedJointStatesRoles::StateNameRole);
+    item->setData(joint_names.join(","), UserDefinedJointStatesRoles::JointNamesRole);
+    item->setData(joint_values.join(","), UserDefinedJointStatesRoles::JointValuesRole);
     parent_item->appendRow(item);
   }
   else // replace
@@ -104,15 +106,19 @@ void UserDefinedJointStatesModel::add(const QString& group_name,
 
 bool UserDefinedJointStatesModel::removeRows(int row, int count, const QModelIndex &parent)
 {
-  QStandardItem *row_item = item(row);
-  QString group_name = row_item->data(this->GroupNameRole).toString();
-  QString state_name = row_item->data(this->StateNameRole).toString();
-  auto& group_states = thor_->getUserDefinedGroupStates();
-  group_states[group_name.toStdString()].erase(state_name.toStdString());
-  if (group_states[group_name.toStdString()].empty())
-    group_states.erase(group_name.toStdString());
+  if (row >= 0)
+  {
+    QStandardItem *row_item = item(row);
+    QString group_name = row_item->data(UserDefinedJointStatesRoles::GroupNameRole).toString();
+    QString state_name = row_item->data(UserDefinedJointStatesRoles::StateNameRole).toString();
+    auto& group_states = thor_->getGroupStates();
+    group_states[group_name.toStdString()].erase(state_name.toStdString());
+    if (group_states[group_name.toStdString()].empty())
+      group_states.erase(group_name.toStdString());
 
-  return QStandardItemModel::removeRows(row, count, parent);
+    return QStandardItemModel::removeRows(row, count, parent);
+  }
+  return false;
 }
 
 }

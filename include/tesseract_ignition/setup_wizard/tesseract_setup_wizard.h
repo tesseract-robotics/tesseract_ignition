@@ -24,11 +24,10 @@ namespace tesseract_ignition
 
         void LoadConfig( const tinyxml2::XMLElement * _pluginElem) override;
 
-
         /**
          * @brief Callback trigged when the load button is pressed.
-         * @param[in] _urdf_filepath The urdf file path.
-         * @param[in] _srdf_filepath The srdf file path.
+         * @param[in] urdf_filepath The urdf file path.
+         * @param[in] srdf_filepath The srdf file path.
          */
         Q_INVOKABLE void onLoad(const QString &urdf_filepath, const QString& srdf_filepath);
         Q_INVOKABLE void onSave(const QString& srdf_filepath);
@@ -52,6 +51,12 @@ namespace tesseract_ignition
 
         Q_INVOKABLE void onAddUserDefinedJointState(const QString &group_name, const QString &state_name);
         Q_INVOKABLE void onRemoveUserDefinedJointState(int index);
+
+        Q_INVOKABLE void onAddUserDefinedTCP(const QString &group_name,
+                                             const QString &tcp_name,
+                                             const QVector3D &position,
+                                             const QVector3D &orientation);
+        Q_INVOKABLE void onRemoveUserDefinedTCP(int index);
 
       protected:
         Q_INVOKABLE void updateTesseract();

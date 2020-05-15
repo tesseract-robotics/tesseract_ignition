@@ -9,6 +9,11 @@ ColumnLayout {
   Layout.minimumWidth: 400
   Layout.minimumHeight: 400
 
+function getParentDir(filePath)
+{
+    return path.dirname(filePath)
+}
+
 FileDialog{
     id: urdfFileDialog;
     title: "Please choose a URDF file";
@@ -47,7 +52,7 @@ FileDialog{
     selectExisting: false
     onAccepted: {
         console.info("User has selected SRDF to save:" + srdfSaveFileDialog.fileUrl);
-        srdfFileDialog.close();
+        srdfSaveFileDialog.close();
         TesseractSetupWizard.onSave(srdfSaveFileDialog.fileUrl.toString());
     }
 }

@@ -39,7 +39,7 @@ Item {
         anchors.leftMargin: 5
         anchors.verticalCenter: userDefinedJointStateNameLabel.verticalCenter
         validator: RegExpValidator {
-            regExp: /[0-9A-Za-z_]+/
+            regExp: /[0-9A-Za-z_ ]+/
         }
     }
 

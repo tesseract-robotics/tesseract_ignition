@@ -37,10 +37,10 @@ void JointListModel::add(tesseract_scene_graph::Joint::ConstPtr joint)
     QStandardItem *parent_item = this->invisibleRootItem();
     QString joint_name = QString::fromStdString(joint->getName());
     auto item = new QStandardItem(joint_name);
-    item->setData(joint_name, this->roleNames().key("name"));
-    item->setData(QString::number(joint->limits->lower), this->roleNames().key("min"));
-    item->setData(QString::number(joint->limits->upper), this->roleNames().key("max"));
-    item->setData(QString::number(0), this->roleNames().key("value"));
+    item->setData(joint_name, JointRoles::NameRole);
+    item->setData(QString::number(joint->limits->lower), JointRoles::MinRole);
+    item->setData(QString::number(joint->limits->upper), JointRoles::MaxRole);
+    item->setData(QString::number(0), JointRoles::ValueRole);
     parent_item->appendRow(item);
   }
 }

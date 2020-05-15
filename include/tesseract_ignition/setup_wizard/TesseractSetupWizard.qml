@@ -94,6 +94,8 @@ Item {
                 ListElement { name: "Allowed Collisions" }
                 ListElement { name: "Kinematic Groups" }
                 ListElement { name: "User States" }
+                ListElement { name: "User TCPs" }
+                ListElement { name: "OPW Kinematics" }
             }
 
             model: nameModel
@@ -184,6 +186,38 @@ Item {
             }
             UserDefinedJointStates {
                 id: userDefinedStatesPage
+                anchors.fill: parent
+            }
+        }
+
+        Page {
+            y: overlayHeader.height
+            header: Label {
+                text: qsTr("User Defined TCPs")
+                font.underline: true
+                topPadding: 10
+                horizontalAlignment: Text.AlignHCenter
+                font.pointSize: 11
+                height: 30
+            }
+            UserDefinedToolCenterPoints {
+                id: userDefinedTCPPage
+                anchors.fill: parent
+            }
+        }
+
+        Page {
+            y: overlayHeader.height
+            header: Label {
+                text: qsTr("OPW Kinematics")
+                font.underline: true
+                topPadding: 10
+                horizontalAlignment: Text.AlignHCenter
+                font.pointSize: 11
+                height: 30
+            }
+            OPWKinematicsDefinition {
+                id: opwKinematicsPage
                 anchors.fill: parent
             }
         }
