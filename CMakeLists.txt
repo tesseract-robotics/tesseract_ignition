@@ -84,26 +84,6 @@ target_include_directories(TesseractGridConfig SYSTEM PUBLIC
     ${IGNITION-COMMON_INCLUDE_DIRS}
     ${IGNITION-RENDERING_INCLUDE_DIRS})
 
-QT5_WRAP_CPP(TesseractLoad_headers_MOC include/tesseract_ignition/load/tesseract_load.h)
-QT5_ADD_RESOURCES(TesseractLoad_resources_RCC include/tesseract_ignition/load/TesseractLoad.qrc)
-
-add_library(TesseractLoad SHARED ${TesseractLoad_headers_MOC} src/tesseract_load.cpp  ${TesseractLoad_resources_RCC})
-target_link_libraries(TesseractLoad PUBLIC
-  tesseract::tesseract_environment_kdl
-  tesseract::tesseract_support
-  tesseract::tesseract_urdf
-  ${IGNITION-COMMON_LIBRARIES}
-  ${IGNITION-GUI_LIBRARIES}
-  ${IGNITION-RENDERING_LIBRARIES}
-  Qt5::Core Qt5::Quick Qt5::QuickControls2 )
-target_include_directories(TesseractLoad PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-    "$<INSTALL_INTERFACE:include>")
-target_include_directories(TesseractLoad SYSTEM PUBLIC
-    ${IGNITION-GUI_INCLUDE_DIRS}
-    ${IGNITION-COMMON_INCLUDE_DIRS}
-    ${IGNITION-RENDERING_INCLUDE_DIRS})
-
 QT5_WRAP_CPP(TesseractSetupWizard_headers_MOC
   include/tesseract_ignition/setup_wizard/tesseract_setup_wizard.h
   include/tesseract_ignition/setup_wizard/models/joint_list_model.h
@@ -216,7 +196,6 @@ tesseract_configure_package(
   ${PROJECT_NAME}
   TesseractScene3D
   TesseractGridConfig
-  TesseractLoad
   TesseractVideoRecorder
   TesseractIgnitionVisualization
   TesseractSetupWizard

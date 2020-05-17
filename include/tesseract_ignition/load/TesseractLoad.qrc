@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/TesseractLoad">
-        <file>TesseractLoadForm.ui.qml</file>
-        <file>TesseractLoad.qml</file>
-    </qresource>
-</RCC>
