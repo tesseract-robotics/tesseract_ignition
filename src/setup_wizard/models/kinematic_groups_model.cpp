@@ -9,6 +9,7 @@ KinematicGroupsModel::KinematicGroupsModel(QObject *parent)
 }
 
 KinematicGroupsModel::KinematicGroupsModel(const KinematicGroupsModel &other)
+  : QStandardItemModel(other.d_ptr->parent)
 {
   this->thor_ = other.thor_;
 }

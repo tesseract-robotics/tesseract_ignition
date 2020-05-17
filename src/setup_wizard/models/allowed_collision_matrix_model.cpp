@@ -9,6 +9,7 @@ AllowedCollisionMatrixModel::AllowedCollisionMatrixModel(QObject *parent)
 }
 
 AllowedCollisionMatrixModel::AllowedCollisionMatrixModel(const AllowedCollisionMatrixModel &other)
+  : QStandardItemModel(other.d_ptr->parent)
 {
   this->thor_ = other.thor_;
 }

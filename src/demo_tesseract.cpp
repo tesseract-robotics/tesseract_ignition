@@ -40,7 +40,7 @@ tesseract_scene_graph::SceneGraph::Ptr getSceneGraph()
   return tesseract_urdf::parseURDFFile(path, locator);
 }
 
-int main(int _argc, char** _argv)
+int main(int /*_argc*/, char** /*_argv*/)
 {
   auto env = std::make_shared<tesseract_environment::KDLEnv>();
 
@@ -58,7 +58,7 @@ int main(int _argc, char** _argv)
   for (long i = 0; i < num_steps; ++i)
   {
     traj.row(i) = Eigen::VectorXd::Zero(num_joints);
-    traj(i, 0) = i * 0.01;
+    traj(i, 0) = static_cast<double>(i) * 0.01;
     traj(i, 1) = 0.5;
   }
 

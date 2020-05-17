@@ -11,6 +11,7 @@ UserDefinedTCPModel::UserDefinedTCPModel(QObject *parent)
 }
 
 UserDefinedTCPModel::UserDefinedTCPModel(const UserDefinedTCPModel &other)
+  : QStandardItemModel(other.d_ptr->parent)
 {
   this->thor_ = other.thor_;
 }

@@ -58,10 +58,18 @@ namespace tesseract_ignition
                                              const QVector3D &orientation);
         Q_INVOKABLE void onRemoveUserDefinedTCP(int index);
 
+        Q_INVOKABLE void onAddGroupOPWKinematics(const QString& group_name,
+                                                 double a1, double a2, double b,
+                                                 double c1, double c2, double c3, double c4,
+                                                 double o1, double o2, double o3, double o4, double o5, double o6,
+                                                 int sc1, int sc2, int sc3, int sc4, int sc5, int sc6);
+        Q_INVOKABLE void onRemoveGroupOPWKinematics(int index);
+
       protected:
         Q_INVOKABLE void updateTesseract();
         Q_INVOKABLE void removeGroupStates(const QString& group_name);
         Q_INVOKABLE void removeGroupTCPs(const QString& group_name);
+        Q_INVOKABLE void removeGroupOPWKinematics(const QString& group_name);
 
 
         /** @brief Used to filter scroll wheel events.

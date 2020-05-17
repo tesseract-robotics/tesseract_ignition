@@ -122,7 +122,7 @@ TesseractLoad::~TesseractLoad()
 }
 
 /////////////////////////////////////////////////
-void TesseractLoad::LoadConfig( const tinyxml2::XMLElement * _pluginElem)
+void TesseractLoad::LoadConfig( const tinyxml2::XMLElement * /*_pluginElem*/)
 {
   if (this->title.empty())
     this->title = "Tesseract Load";

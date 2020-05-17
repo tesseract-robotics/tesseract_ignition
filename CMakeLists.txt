@@ -110,7 +110,8 @@ QT5_WRAP_CPP(TesseractSetupWizard_headers_MOC
   include/tesseract_ignition/setup_wizard/models/allowed_collision_matrix_model.h
   include/tesseract_ignition/setup_wizard/models/kinematic_groups_model.h
   include/tesseract_ignition/setup_wizard/models/user_defined_joint_states_model.h
-  include/tesseract_ignition/setup_wizard/models/user_defined_tcp_model.h)
+  include/tesseract_ignition/setup_wizard/models/user_defined_tcp_model.h
+  include/tesseract_ignition/setup_wizard/models/opw_kinematics_model.h)
 QT5_ADD_RESOURCES(TesseractSetupWizard_resources_RCC include/tesseract_ignition/setup_wizard/TesseractSetupWizard.qrc)
 
 add_library(TesseractSetupWizard SHARED
@@ -121,6 +122,7 @@ add_library(TesseractSetupWizard SHARED
   src/setup_wizard/models/kinematic_groups_model.cpp
   src/setup_wizard/models/user_defined_joint_states_model.cpp
   src/setup_wizard/models/user_defined_tcp_model.cpp
+  src/setup_wizard/models/opw_kinematics_model.cpp
   ${TesseractSetupWizard_resources_RCC})
 target_link_libraries(TesseractSetupWizard PUBLIC
   ${PROJECT_NAME}

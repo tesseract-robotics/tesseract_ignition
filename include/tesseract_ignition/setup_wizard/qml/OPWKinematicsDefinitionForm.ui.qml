@@ -8,13 +8,31 @@ import QtQuick.Controls.Styles 1.4
 
 Item {
     id: element
-
+    width: 400
+    height: 800
     property alias opwKinematicsGroupNameComboBox: opwKinematicsGroupNameComboBox
     property alias addOPWKinematicsButton: addOPWKinematicsButton
     property alias opwKinematicsTableView: opwKinematicsTableView
     property alias removeOPWKinematicsButton: removeOPWKinematicsButton
-    width: 400
-    height: 800
+    property alias jointCorrectionSwitch5: jointCorrectionSwitch5
+    property alias jointCorrectionSwitch4: jointCorrectionSwitch4
+    property alias jointCorrectionSwitch3: jointCorrectionSwitch3
+    property alias jointCorrectionSwitch2: jointCorrectionSwitch2
+    property alias jointCorrectionSwitch1: jointCorrectionSwitch1
+    property alias jointCorrectionSwitch: jointCorrectionSwitch
+    property alias jointOffsetTextField5: jointOffsetTextField5
+    property alias jointOffsetTextField4: jointOffsetTextField4
+    property alias jointOffsetTextField3: jointOffsetTextField3
+    property alias jointOffsetTextField2: jointOffsetTextField2
+    property alias jointOffsetTextField1: jointOffsetTextField1
+    property alias jointOffsetTextField: jointOffsetTextField
+    property alias c4TextField: c4TextField
+    property alias c3TextField: c3TextField
+    property alias c2TextField: c2TextField
+    property alias c1TextField: c1TextField
+    property alias bTextField: bTextField
+    property alias a2TextField: a2TextField
+    property alias a1TextField: a1TextField
 
     QC1.TableView {
         id: opwKinematicsTableView
@@ -36,20 +54,20 @@ Item {
         }
         QC1.TableViewColumn {
             id: kinematicParametersColumn
-            role: "kinematic_parameters"
+            role: "parameters"
             title: "Kin Parameters"
             width: 125
         }
         QC1.TableViewColumn {
             id: offsetColumn
-            role: "joint_offset"
-            title: "Joint Offset"
+            role: "offsets"
+            title: "Joint Offsets"
             width: 125
         }
         QC1.TableViewColumn {
             id: signCorrectionColumn
-            role: "joint_correction"
-            title: "Joint Correction"
+            role: "sign_corrections"
+            title: "Sign Corrections"
             width: opwKinematicsTableView.viewport.width - groupNameColumn.width
                    - kinematicParametersColumn.width - offsetColumn.width
         }
@@ -96,25 +114,6 @@ Item {
         anchors.topMargin: 5
         anchors.right: parent.right
         anchors.rightMargin: 5
-    }
-
-    Connections {
-        target: opwKinematicsGroupNameComboBox
-        onCurrentTextChanged: TesseractSetupWizard.onLoadJointGroup(
-                                  opwKinematicsGroupNameComboBox.currentText)
-    }
-
-    Connections {
-        target: addOPWKinematicsButton
-        onClicked: TesseractSetupWizard.onAddUserDefinedJointState(
-                       opwKinematicsGroupNameComboBox.currentText,
-                       userDefinedJointStateNameTextField.text)
-    }
-
-    Connections {
-        target: removeOPWKinematicsButton
-        onClicked: TesseractSetupWizard.onRemoveUserDefinedJointState(
-                       opwKinematicsTableView.currentRow)
     }
 
     GridLayout {

@@ -16,6 +16,7 @@
 #include <tesseract_ignition/setup_wizard/models/kinematic_groups_model.h>
 #include <tesseract_ignition/setup_wizard/models/user_defined_joint_states_model.h>
 #include <tesseract_ignition/setup_wizard/models/user_defined_tcp_model.h>
+#include <tesseract_ignition/setup_wizard/models/opw_kinematics_model.h>
 #include <tesseract_ignition/gui_events.h>
 #include <tesseract_ignition/entity_manager.h>
 #include <tesseract_ignition/conversions.h>
@@ -82,6 +83,8 @@ class TesseractSetupWizardPrivate
   UserDefinedJointStatesModel user_joint_states_model;
 
   UserDefinedTCPModel user_tcp_model;
+
+  OPWKinematicsModel opw_kinematics_model;
 
   JointListModel joint_group_model;
 
@@ -187,6 +190,7 @@ TesseractSetupWizard::TesseractSetupWizard()
   ignition::gui::App()->Engine()->rootContext()->setContextProperty("jointGroupModel", &this->data_->joint_group_model);
   ignition::gui::App()->Engine()->rootContext()->setContextProperty("linkListViewModel", &this->data_->group_link_list_model);
   ignition::gui::App()->Engine()->rootContext()->setContextProperty("jointListViewModel", &this->data_->group_joint_list_model);
+  ignition::gui::App()->Engine()->rootContext()->setContextProperty("opwKinematicsModel", &this->data_->opw_kinematics_model);
 }
 
 /////////////////////////////////////////////////
@@ -195,7 +199,7 @@ TesseractSetupWizard::~TesseractSetupWizard()
 }
 
 /////////////////////////////////////////////////
-void TesseractSetupWizard::LoadConfig( const tinyxml2::XMLElement * _pluginElem)
+void TesseractSetupWizard::LoadConfig( const tinyxml2::XMLElement * /*_pluginElem*/)
 {
   if (this->title.empty())
     this->title = "Tesseract Setup Wizard";
@@ -232,6 +236,7 @@ void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& s
     this->data_->joint_group_model.clear();
     this->data_->user_joint_states_model.clear();
     this->data_->user_tcp_model.clear();
+    this->data_->opw_kinematics_model.clear();
 
     // Build link list model
     const std::vector<std::string>& link_names = this->data_->thor->getEnvironmentConst()->getLinkNames();
@@ -264,6 +269,9 @@ void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& s
 
     // Build Groups TCPs Model
     this->data_->user_tcp_model.setTesseract(this->data_->thor);
+
+    // Build OPW kinematics Model
+    this->data_->opw_kinematics_model.setTesseract(this->data_->thor);
   }
 
   this->data_->load_environment = true;
@@ -277,7 +285,10 @@ Q_INVOKABLE void TesseractSetupWizard::onSave(const QString& srdf_filepath)
 
 void TesseractSetupWizard::onAddChainGroup(const QString &group_name, const QString& base_link, const QString& tip_link)
 {
-  CONSOLE_BRIDGE_logError("onAddChainGroup");
+  // If group name is empty then return
+  if (group_name.trimmed().isEmpty())
+    return;
+
   QStringList list = {base_link, tip_link};
   std::vector<std::string> groups = this->data_->thor->getFwdKinematicsManager()->getAvailableFwdKinematicsManipulators();
   this->data_->kin_groups_model.add(group_name, CHAIN_GROUP, list);
@@ -285,41 +296,50 @@ void TesseractSetupWizard::onAddChainGroup(const QString &group_name, const QStr
   {
     if (std::find(groups.begin(), groups.end(), group_name.toStdString()) != groups.end())
     {
-      // The manipulator was replace so remove its group states and tcps
+      // Remove Group States, TCPs and OPW Kinematics associated with the group
       removeGroupStates(group_name);
       removeGroupTCPs(group_name);
+      removeGroupOPWKinematics(group_name);
     }
   }
 }
 
 void TesseractSetupWizard::onAddJointGroup(const QString &group_name)
 {
-  CONSOLE_BRIDGE_logError("onAddJointGroup");
+  // If group name is empty then return
+  if (group_name.trimmed().isEmpty())
+    return;
+
   std::vector<std::string> groups = this->data_->thor->getFwdKinematicsManager()->getAvailableFwdKinematicsManipulators();
   this->data_->kin_groups_model.add(group_name, JOINT_LIST_GROUP, this->data_->group_joint_list_model.stringList());
   if (!group_name.isEmpty())
   {
     if (std::find(groups.begin(), groups.end(), group_name.toStdString()) != groups.end())
     {
-      // The manipulator was replace so remove its group states and tcps
+      // Remove Group States, TCPs and OPW Kinematics associated with the group
       removeGroupStates(group_name);
       removeGroupTCPs(group_name);
+      removeGroupOPWKinematics(group_name);
     }
   }
 }
 
 void TesseractSetupWizard::onAddLinkGroup(const QString &group_name)
 {
-  CONSOLE_BRIDGE_logError("onAddLinkGroup");
+  // If group name is empty then return
+  if (group_name.trimmed().isEmpty())
+    return;
+
   std::vector<std::string> groups = this->data_->thor->getFwdKinematicsManager()->getAvailableFwdKinematicsManipulators();
   this->data_->kin_groups_model.add(group_name, LINK_LIST_GROUP, this->data_->group_link_list_model.stringList());
   if (!group_name.isEmpty())
   {
     if (std::find(groups.begin(), groups.end(), group_name.toStdString()) != groups.end())
     {
-      // The manipulator was replace so remove its group states and tcps
+      // Remove Group States, TCPs and OPW Kinematics associated with the group
       removeGroupStates(group_name);
       removeGroupTCPs(group_name);
+      removeGroupOPWKinematics(group_name);
     }
   }
 }
@@ -366,9 +386,10 @@ void TesseractSetupWizard::onRemoveKinematicGroup(int index)
     QString group_name = this->data_->kin_groups_model.item(index, 0)->data(this->data_->kin_groups_model.NameRole).toString();
     if (this->data_->kin_groups_model.removeRow(index))
     {
-      // Remove Group States and TCPs associated with the group
+      // Remove Group States, TCPs and OPW Kinematics associated with the group
       removeGroupStates(group_name);
       removeGroupTCPs(group_name);
+      removeGroupOPWKinematics(group_name);
     }
   }
 }
@@ -477,7 +498,7 @@ void TesseractSetupWizard::onJointValue(const QString &joint_name, double joint_
 void TesseractSetupWizard::onAddUserDefinedJointState(const QString &group_name, const QString &state_name)
 {
   CONSOLE_BRIDGE_logError("onAddUserDefinedJointState");
-  if (!group_name.isEmpty() && !state_name.isEmpty())
+  if (!group_name.trimmed().isEmpty() && !state_name.trimmed().isEmpty())
   {
     QStringList joint_names;
     QStringList joint_values;
@@ -503,7 +524,7 @@ void TesseractSetupWizard::onAddUserDefinedTCP(const QString &group_name,
                                                const QVector3D& orientation)
 {
   CONSOLE_BRIDGE_logError("onAddUserDefinedTCP");
-  if (!group_name.isEmpty() && !tcp_name.isEmpty())
+  if (!group_name.trimmed().isEmpty() && !tcp_name.trimmed().isEmpty())
     this->data_->user_tcp_model.add(group_name, tcp_name, position, orientation);
 
 }
@@ -512,6 +533,23 @@ void TesseractSetupWizard::onRemoveUserDefinedTCP(int index)
 {
   CONSOLE_BRIDGE_logError("onRemoveUserDefinedTCP");
   this->data_->user_tcp_model.removeRow(index);
+}
+
+void TesseractSetupWizard::onAddGroupOPWKinematics(const QString& group_name,
+                                                   double a1, double a2, double b,
+                                                   double c1, double c2, double c3, double c4,
+                                                   double o1, double o2, double o3, double o4, double o5, double o6,
+                                                   int sc1, int sc2, int sc3, int sc4, int sc5, int sc6)
+{
+  CONSOLE_BRIDGE_logError("onAddGroupOPWKinematics");
+  if (!group_name.trimmed().isEmpty())
+    this->data_->opw_kinematics_model.add(group_name, a1, a2, b, c1, c2, c3, c4, o1, o2, o3, o4, o5, o6, sc1, sc2, sc3, sc4, sc5, sc6);
+}
+
+void TesseractSetupWizard::onRemoveGroupOPWKinematics(int index)
+{
+  CONSOLE_BRIDGE_logError("onRemoveGroupOPWKinematics");
+  this->data_->opw_kinematics_model.removeRow(index);
 }
 
 bool TesseractSetupWizard::eventFilter(QObject *_obj, QEvent *_event)
@@ -604,6 +642,13 @@ void TesseractSetupWizard::removeGroupTCPs(const QString& group_name)
   auto matches = this->data_->user_tcp_model.match(this->data_->user_tcp_model.index(0, 0), this->data_->user_tcp_model.GroupNameRole, group_name, 1, Qt::MatchExactly);
   if (!matches.empty())
     this->data_->user_tcp_model.removeRows(matches[0].row(), 1);
+}
+
+void TesseractSetupWizard::removeGroupOPWKinematics(const QString& group_name)
+{
+  auto matches = this->data_->opw_kinematics_model.match(this->data_->opw_kinematics_model.index(0, 0), this->data_->opw_kinematics_model.GroupNameRole, group_name, 1, Qt::MatchExactly);
+  if (!matches.empty())
+    this->data_->opw_kinematics_model.removeRows(matches[0].row(), 1);
 }
 
 // Register this plugin

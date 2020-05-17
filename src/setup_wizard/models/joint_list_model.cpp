@@ -9,6 +9,7 @@ JointListModel::JointListModel(QObject *parent)
 }
 
 JointListModel::JointListModel(const JointListModel &other)
+  : QStandardItemModel(other.d_ptr->parent)
 {
   this->joints_ = other.joints_;
 }

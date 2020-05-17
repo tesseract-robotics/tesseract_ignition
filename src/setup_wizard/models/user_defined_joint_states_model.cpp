@@ -9,6 +9,7 @@ UserDefinedJointStatesModel::UserDefinedJointStatesModel(QObject *parent)
 }
 
 UserDefinedJointStatesModel::UserDefinedJointStatesModel(const UserDefinedJointStatesModel &other)
+  : QStandardItemModel(other.d_ptr->parent)
 {
   this->thor_ = other.thor_;
 }
