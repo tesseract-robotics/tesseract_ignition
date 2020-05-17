@@ -53,7 +53,7 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
 QT5_WRAP_CPP(TesseractScene3D_headers_MOC include/tesseract_ignition/scene3d/tesseract_scene3d.h)
 QT5_ADD_RESOURCES(TesseractScene3D_resources_RCC include/tesseract_ignition/scene3d/TesseractScene3D.qrc)
 
-add_library(TesseractScene3D SHARED ${TesseractScene3D_headers_MOC} src/tesseract_scene3d.cpp  ${TesseractScene3D_resources_RCC})
+add_library(TesseractScene3D SHARED ${TesseractScene3D_headers_MOC} src/scene3d/tesseract_scene3d.cpp  ${TesseractScene3D_resources_RCC})
 target_link_libraries(TesseractScene3D PUBLIC
   ${IGNITION-COMMON_LIBRARIES}
   ${IGNITION-GUI_LIBRARIES}
@@ -74,7 +74,7 @@ target_include_directories(TesseractScene3D SYSTEM PUBLIC
 QT5_WRAP_CPP(TesseractGridConfig_headers_MOC include/tesseract_ignition/grid/tesseract_grid_config.h)
 QT5_ADD_RESOURCES(TesseractGridConfig_resources_RCC include/tesseract_ignition/grid/TesseractGridConfig.qrc)
 
-add_library(TesseractGridConfig SHARED ${TesseractGridConfig_headers_MOC} src/tesseract_grid_config.cpp  ${TesseractGridConfig_resources_RCC})
+add_library(TesseractGridConfig SHARED ${TesseractGridConfig_headers_MOC} src/grid/tesseract_grid_config.cpp  ${TesseractGridConfig_resources_RCC})
 target_link_libraries(TesseractGridConfig PUBLIC ${IGNITION-COMMON_LIBRARIES} ${IGNITION-GUI_LIBRARIES} ${IGNITION-RENDERING_LIBRARIES} Qt5::Core Qt5::Quick Qt5::QuickControls2 )
 target_include_directories(TesseractGridConfig PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -125,7 +125,7 @@ target_include_directories(TesseractSetupWizard SYSTEM PUBLIC
 QT5_WRAP_CPP(TesseractVideoRecorder_headers_MOC include/tesseract_ignition/recorder/tesseract_video_recorder.h)
 QT5_ADD_RESOURCES(TesseractVideoRecorder_resources_RCC include/tesseract_ignition/recorder/TesseractVideoRecorder.qrc)
 
-add_library(TesseractVideoRecorder SHARED ${TesseractVideoRecorder_headers_MOC} src/tesseract_video_recorder.cpp  ${TesseractVideoRecorder_resources_RCC})
+add_library(TesseractVideoRecorder SHARED ${TesseractVideoRecorder_headers_MOC} src/recorder/tesseract_video_recorder.cpp  ${TesseractVideoRecorder_resources_RCC})
 target_link_libraries(TesseractVideoRecorder PUBLIC
   ${IGNITION-COMMON_LIBRARIES}
   ${IGNITION-GUI_LIBRARIES}
