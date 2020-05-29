@@ -1,3 +1,29 @@
+/**
+ * @file opw_kinematics_model.cpp
+ * @brief A Qt Standard Item Model for OPW Kinematic
+ *
+ * @author Levi Armstrong
+ * @date May 14, 2020
+ * @version TODO
+ * @bug No known bugs
+ *
+ * @copyright Copyright (c) 2020, Southwest Research Institute
+ *
+ * @par License
+ * Software License Agreement (Apache License)
+ * @par
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * @par
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include <tesseract_ignition/setup_wizard/models/opw_kinematics_model.h>
 #include <Eigen/Geometry>
 #include <QVector3D>
@@ -54,7 +80,7 @@ void OPWKinematicsModel::add(const QString& group_name,
   if (group == group_opw_kinematics.end())
   {
     add = true;
-    group_opw_kinematics[group_name.toStdString()] = tesseract_scene_graph::SRDFModel::OPWKinematicParameters();
+    group_opw_kinematics[group_name.toStdString()] = tesseract_scene_graph::OPWKinematicParameters();
     group = group_opw_kinematics.find(group_name.toStdString());
   }
 
@@ -97,7 +123,7 @@ bool OPWKinematicsModel::removeRows(int row, int count, const QModelIndex &paren
   return false;
 }
 
-void OPWKinematicsModel::addItem(const QString& group_name, const tesseract_scene_graph::SRDFModel::OPWKinematicParameters& opw)
+void OPWKinematicsModel::addItem(const QString& group_name, const tesseract_scene_graph::OPWKinematicParameters& opw)
 {
   QStandardItem *parent_item = this->invisibleRootItem();
   auto item = new QStandardItem();

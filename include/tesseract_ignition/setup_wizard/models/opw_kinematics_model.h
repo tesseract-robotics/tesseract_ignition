@@ -1,3 +1,28 @@
+/**
+ * @file opw_kinematics_model.h
+ * @brief A Qt Standard Item Model for OPW Kinematic
+ *
+ * @author Levi Armstrong
+ * @date May 14, 2020
+ * @version TODO
+ * @bug No known bugs
+ *
+ * @copyright Copyright (c) 2020, Southwest Research Institute
+ *
+ * @par License
+ * Software License Agreement (Apache License)
+ * @par
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * @par
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #ifndef TESSERACT_IGNITION_OPW_KINEMATICS_MODEL_H
 #define TESSERACT_IGNITION_OPW_KINEMATICS_MODEL_H
 
@@ -45,7 +70,7 @@ private:
    * @brief A helper function to add the opw data to the model.
    * @param opw OPW Kinematics data to be added
    */
-  void addItem(const QString &group_name, const tesseract_scene_graph::SRDFModel::OPWKinematicParameters& opw);
+  void addItem(const QString &group_name, const tesseract_scene_graph::OPWKinematicParameters& opw);
 };
 
 }

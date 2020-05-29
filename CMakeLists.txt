@@ -33,14 +33,16 @@ link_directories(
   ${IGNITION-MSGS_LIBRARY_DIRS}
 )
 
-add_library(${PROJECT_NAME} SHARED src/conversions.cpp src/entity_manager.cpp)
+add_library(${PROJECT_NAME} SHARED src/conversions.cpp src/entity_manager.cpp src/utils.cpp src/render_utils.cpp)
 target_link_libraries(${PROJECT_NAME} PUBLIC
-  tesseract::tesseract_environment_core
-  tesseract::tesseract_visualization
-  tesseract::tesseract_common
+  tesseract::tesseract_environment_kdl
+  tesseract::tesseract_support
+  tesseract::tesseract_urdf
+  tesseract::tesseract
   ${IGNITION-COMMON_LIBRARIES}
   ${IGNITION-RENDERING_LIBRARIES}
-  ${IGNITION-MSGS_LIBRARIES})
+  ${IGNITION-MSGS_LIBRARIES}
+  Qt5::Core)
 tesseract_target_compile_options(${PROJECT_NAME} PUBLIC)
 target_include_directories(${PROJECT_NAME} PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"

@@ -17,16 +17,18 @@
 #include <tesseract_ignition/setup_wizard/models/user_defined_joint_states_model.h>
 #include <tesseract_ignition/setup_wizard/models/user_defined_tcp_model.h>
 #include <tesseract_ignition/setup_wizard/models/opw_kinematics_model.h>
+#include <tesseract_ignition/render_utils.h>
 #include <tesseract_ignition/gui_events.h>
 #include <tesseract_ignition/entity_manager.h>
 #include <tesseract_ignition/conversions.h>
+#include <tesseract_ignition/utils.h>
 #include <tesseract/tesseract.h>
 #include <tesseract_urdf/urdf_parser.h>
 #include <tesseract_scene_graph/resource_locator.h>
 #include <tesseract_environment/kdl/kdl_env.h>
 #include <memory>
 #include <QMetaObject>
-#include <boost/algorithm/string/split.hpp>
+
 
 Q_DECLARE_SMART_POINTER_METATYPE(std::shared_ptr);
 
@@ -39,38 +41,20 @@ static std::unordered_map<std::string, std::string> cache_package_paths;
 namespace tesseract_ignition::gui::plugins
 {
 
-// QML Data Model Names
-// acmModel - Allowed Collision Matrix
-// kinematicGroupsModel - KinematicGroupModel
-//
-
 class TesseractSetupWizardPrivate
 {
-  public:
+public:
 
-  /// \brief Flag that indicates whether there are new updates to be rendered.
-  bool load_environment{false};
-  bool update_transforms {false};
-
+  /** @brief URDF file path */
   std::string urdf_filepath;
 
+  /** @brief SRDF file path */
   std::string srdf_filepath;
 
-  std::string engine_name {"ogre"};
-
-  std::string scene_name {"scene"};
-
-  EntityManager entity_manager;
-
+  /** @brief The Tesseract resource locator */
   tesseract_scene_graph::ResourceLocator::Ptr locator;
 
-  tesseract::Tesseract::Ptr thor;
-
-  ignition::rendering::ScenePtr scene {nullptr};
-
-  std::vector<ignition::rendering::AxisVisualPtr> axes;
-
-  std::vector<ignition::rendering::VisualPtr> visual;
+  tesseract_ignition::RenderUtil render_util;
 
   QStringListModel link_model;
 
@@ -94,81 +78,6 @@ class TesseractSetupWizardPrivate
 };
 }
 
-std::string locateResource(const std::string& url)
-{
-  std::string mod_url = url;
-  if (url.find("package://tesseract_support") == 0)
-  {
-    mod_url.erase(0, strlen("package://tesseract_support"));
-    size_t pos = mod_url.find('/');
-    if (pos == std::string::npos)
-    {
-      return std::string();
-    }
-
-    std::string package = mod_url.substr(0, pos);
-    mod_url.erase(0, pos);
-    std::string package_path = std::string(TESSERACT_SUPPORT_DIR);
-
-    if (package_path.empty())
-    {
-      return std::string();
-    }
-
-    mod_url = package_path + mod_url;
-  }
-  else if (url.find("file:///") == 0)
-  {
-    mod_url.erase(0, strlen("file://"));
-    size_t pos = mod_url.find('/');
-    if (pos == std::string::npos)
-    {
-      return std::string();
-    }
-  }
-  else if (url.find("package://") == 0)
-  {
-    mod_url.erase(0, strlen("package://"));
-    size_t pos = mod_url.find('/');
-    if (pos == std::string::npos)
-    {
-      return std::string();
-    }
-
-    std::string package = mod_url.substr(0, pos);
-    mod_url.erase(0, pos);
-
-    if (cache_package_paths.empty())
-    {
-      char* ros_package_paths = std::getenv("ROS_PACKAGE_PATH");
-      std::vector<std::string> tokens;
-      boost::split(tokens, ros_package_paths, boost::is_any_of(":"), boost::token_compress_on);
-      for (const auto& token : tokens)
-      {
-        QDir d(QString::fromStdString(token));
-        if (d.exists())
-          cache_package_paths[d.dirName().toStdString()] = token;
-      }
-    }
-    auto find_package = cache_package_paths.find(package);
-
-    if (find_package != cache_package_paths.end())
-      mod_url = find_package->second + mod_url;
-    else
-      return std::string();
-  }
-
-  return mod_url;
-}
-
-tesseract_scene_graph::SceneGraph::Ptr getSceneGraph(std::string path)
-{
-  tesseract_scene_graph::ResourceLocator::Ptr locator =
-      std::make_shared<tesseract_scene_graph::SimpleResourceLocator>(locateResource);
-  return tesseract_urdf::parseURDFFile(locateResource(path), locator);
-}
-
-
 using namespace tesseract_ignition;
 using namespace gui;
 using namespace plugins;
@@ -178,8 +87,6 @@ TesseractSetupWizard::TesseractSetupWizard()
   : ignition::gui::Plugin()
   , data_(new TesseractSetupWizardPrivate)
 {
-  data_->thor = std::make_shared<tesseract::Tesseract>();
-
   // Connect model
   ignition::gui::App()->Engine()->rootContext()->setContextProperty("linkModel", &this->data_->link_model);
   ignition::gui::App()->Engine()->rootContext()->setContextProperty("jointModel", &this->data_->joint_model);
@@ -210,21 +117,22 @@ void TesseractSetupWizard::LoadConfig( const tinyxml2::XMLElement * /*_pluginEle
 /////////////////////////////////////////////////
 void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& srdf_filepath)
 {
-  this->data_->locator = std::make_shared<tesseract_scene_graph::SimpleResourceLocator>(locateResource);
+  auto thor = std::make_shared<tesseract::Tesseract>();
+  this->data_->locator = std::make_shared<tesseract_scene_graph::SimpleResourceLocator>(tesseract_ignition::locateResource);
   this->data_->urdf_filepath = this->data_->locator->locateResource(urdf_filepath.toStdString())->getFilePath();
   if (srdf_filepath.toStdString().empty())
   {
-    this->data_->thor->init(boost::filesystem::path(this->data_->urdf_filepath), this->data_->locator);
+    thor->init(boost::filesystem::path(this->data_->urdf_filepath), this->data_->locator);
   }
   else
   {
     this->data_->srdf_filepath = this->data_->locator->locateResource(srdf_filepath.toStdString())->getFilePath();
-    this->data_->thor->init(boost::filesystem::path(this->data_->urdf_filepath),
-                           boost::filesystem::path(this->data_->srdf_filepath),
-                           this->data_->locator);
+    thor->init(boost::filesystem::path(this->data_->urdf_filepath), boost::filesystem::path(this->data_->srdf_filepath), this->data_->locator);
   }
 
-  if (this->data_->thor->isInitialized())
+  this->data_->render_util.setTesseract(thor);
+
+  if (this->data_->render_util.getTesseract())
   {
     // Clear Models
     this->data_->joint_model.clear();
@@ -239,7 +147,7 @@ void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& s
     this->data_->opw_kinematics_model.clear();
 
     // Build link list model
-    const std::vector<std::string>& link_names = this->data_->thor->getEnvironmentConst()->getLinkNames();
+    const std::vector<std::string>& link_names = this->data_->render_util.getTesseractConst()->getEnvironmentConst()->getLinkNames();
     QStringList links;
     links.reserve(static_cast<int>(link_names.size()));
     for (const auto& link_name : link_names)
@@ -249,7 +157,7 @@ void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& s
     this->data_->link_model.sort(0);
 
     // Build Joint list model
-    for (const auto& joint : this->data_->thor->getEnvironmentConst()->getSceneGraph()->getJoints())
+    for (const auto& joint : this->data_->render_util.getTesseractConst()->getEnvironmentConst()->getSceneGraph()->getJoints())
     {
       if (joint->type == tesseract_scene_graph::JointType::REVOLUTE || joint->type == tesseract_scene_graph::JointType::PRISMATIC)
       {
@@ -259,28 +167,26 @@ void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& s
     this->data_->joint_model.sort(0);
 
     // Build ACM Model
-    this->data_->acm_model.setTesseract(this->data_->thor);
+    this->data_->acm_model.setTesseract(this->data_->render_util.getTesseract());
 
     // Build Kinematic Groups Model
-    this->data_->kin_groups_model.setTesseract(this->data_->thor);
+    this->data_->kin_groups_model.setTesseract(this->data_->render_util.getTesseract());
 
     // Build Groups Joint States Model
-    this->data_->user_joint_states_model.setTesseract(this->data_->thor);
+    this->data_->user_joint_states_model.setTesseract(this->data_->render_util.getTesseract());
 
     // Build Groups TCPs Model
-    this->data_->user_tcp_model.setTesseract(this->data_->thor);
+    this->data_->user_tcp_model.setTesseract(this->data_->render_util.getTesseract());
 
     // Build OPW kinematics Model
-    this->data_->opw_kinematics_model.setTesseract(this->data_->thor);
+    this->data_->opw_kinematics_model.setTesseract(this->data_->render_util.getTesseract());
   }
-
-  this->data_->load_environment = true;
 }
 
-Q_INVOKABLE void TesseractSetupWizard::onSave(const QString& srdf_filepath)
+void TesseractSetupWizard::onSave(const QString& srdf_filepath)
 {
-  std::string local_path = this->data_->locator->locateResource(srdf_filepath.toStdString())->getFilePath();
-  this->data_->thor->getSRDFModelConst()->saveToFile(local_path);
+  std::string local_path = this->data_->render_util.locateResource(srdf_filepath.toStdString())->getFilePath();
+  this->data_->render_util.getTesseract()->getSRDFModelConst()->saveToFile(local_path);
 }
 
 void TesseractSetupWizard::onAddChainGroup(const QString &group_name, const QString& base_link, const QString& tip_link)
@@ -290,7 +196,7 @@ void TesseractSetupWizard::onAddChainGroup(const QString &group_name, const QStr
     return;
 
   QStringList list = {base_link, tip_link};
-  std::vector<std::string> groups = this->data_->thor->getFwdKinematicsManager()->getAvailableFwdKinematicsManipulators();
+  std::vector<std::string> groups = this->data_->render_util.getTesseract()->getFwdKinematicsManager()->getAvailableFwdKinematicsManipulators();
   this->data_->kin_groups_model.add(group_name, CHAIN_GROUP, list);
   if (!group_name.isEmpty())
   {
@@ -310,7 +216,7 @@ void TesseractSetupWizard::onAddJointGroup(const QString &group_name)
   if (group_name.trimmed().isEmpty())
     return;
 
-  std::vector<std::string> groups = this->data_->thor->getFwdKinematicsManager()->getAvailableFwdKinematicsManipulators();
+  std::vector<std::string> groups = this->data_->render_util.getTesseract()->getFwdKinematicsManager()->getAvailableFwdKinematicsManipulators();
   this->data_->kin_groups_model.add(group_name, JOINT_LIST_GROUP, this->data_->group_joint_list_model.stringList());
   if (!group_name.isEmpty())
   {
@@ -330,7 +236,7 @@ void TesseractSetupWizard::onAddLinkGroup(const QString &group_name)
   if (group_name.trimmed().isEmpty())
     return;
 
-  std::vector<std::string> groups = this->data_->thor->getFwdKinematicsManager()->getAvailableFwdKinematicsManipulators();
+  std::vector<std::string> groups = this->data_->render_util.getTesseract()->getFwdKinematicsManager()->getAvailableFwdKinematicsManipulators();
   this->data_->kin_groups_model.add(group_name, LINK_LIST_GROUP, this->data_->group_link_list_model.stringList());
   if (!group_name.isEmpty())
   {
@@ -346,7 +252,6 @@ void TesseractSetupWizard::onAddLinkGroup(const QString &group_name)
 
 void TesseractSetupWizard::onAddJointGroupJoint(const QString &joint_name)
 {
-  CONSOLE_BRIDGE_logError("onAddJointGroup");
   QStringList l = this->data_->group_joint_list_model.stringList();
   if (!l.contains(joint_name) && !joint_name.isEmpty())
   {
@@ -357,13 +262,11 @@ void TesseractSetupWizard::onAddJointGroupJoint(const QString &joint_name)
 
 void TesseractSetupWizard::onRemoveJointGroupJoint(int index)
 {
-  CONSOLE_BRIDGE_logError("onRemoveJointGroupJoint");
   this->data_->group_joint_list_model.removeRow(index);
 }
 
 void TesseractSetupWizard::onAddLinkGroupLink(const QString &link_name)
 {
-  CONSOLE_BRIDGE_logError("onAddLinkGroupLink");
   QStringList l = this->data_->group_link_list_model.stringList();
   if (!l.contains(link_name) && !link_name.isEmpty())
   {
@@ -374,13 +277,11 @@ void TesseractSetupWizard::onAddLinkGroupLink(const QString &link_name)
 
 void TesseractSetupWizard::onRemoveLinkGroupLink(int index)
 {
-  CONSOLE_BRIDGE_logError("onRemoveLinkGroupLink");
   this->data_->group_link_list_model.removeRow(index);
 }
 
 void TesseractSetupWizard::onRemoveKinematicGroup(int index)
 {
-  CONSOLE_BRIDGE_logError("onRemoveKinematicGroup");
   if (index >= 0)
   {
     QString group_name = this->data_->kin_groups_model.item(index, 0)->data(this->data_->kin_groups_model.NameRole).toString();
@@ -396,9 +297,8 @@ void TesseractSetupWizard::onRemoveKinematicGroup(int index)
 
 void TesseractSetupWizard::onGenerateACM(long resolution)
 {
-  CONSOLE_BRIDGE_logError("onGenerateACM");
-  auto& env = this->data_->thor->getEnvironment();
-  auto& srdf = this->data_->thor->getSRDFModel();
+  auto& env = this->data_->render_util.getTesseract()->getEnvironment();
+  auto& srdf = this->data_->render_util.getTesseract()->getSRDFModel();
   auto contact_manager = env->getDiscreteContactManager();
   auto state_solver = env->getStateSolver();
 
@@ -461,27 +361,32 @@ void TesseractSetupWizard::onGenerateACM(long resolution)
     }
   }
 
-  this->data_->acm_model.setTesseract(this->data_->thor);
+  this->data_->acm_model.setTesseract(this->data_->render_util.getTesseract());
 }
 
 void TesseractSetupWizard::onRemoveACMEntry(int index)
 {
-  CONSOLE_BRIDGE_logError("onRemoveACMEntry");
   this->data_->acm_model.removeRow(index);
+}
+
+void TesseractSetupWizard::onClickedACMEntry(int index)
+{
+//  this->data_->selected_entities.clear();
+//  this->data_->selected_entities.push_back(this->data_->entity_manager.getLink("link_1"));
+//  this->data_->update_selections = true;
 }
 
 void TesseractSetupWizard::onLoadJointGroup(const QString &group_name)
 {
   this->data_->joint_group_model.clear();
-  auto kin = this->data_->thor->getFwdKinematicsManagerConst()->getFwdKinematicSolver(group_name.toStdString());
+  auto kin = this->data_->render_util.getTesseractConst()->getFwdKinematicsManagerConst()->getFwdKinematicSolver(group_name.toStdString());
   if (kin != nullptr)
     for (const auto& joint_name : kin->getJointNames())
-      this->data_->joint_group_model.add(this->data_->thor->getEnvironmentConst()->getSceneGraph()->getJoint(joint_name));
+      this->data_->joint_group_model.add(this->data_->render_util.getTesseractConst()->getEnvironmentConst()->getSceneGraph()->getJoint(joint_name));
 }
 
 void TesseractSetupWizard::onJointValue(const QString &joint_name, double joint_value)
 {
-  CONSOLE_BRIDGE_logError("onJointValue");
   for (int i = 0; i < this->data_->joint_group_model.rowCount(); ++i)
   {
     QStandardItem* item = this->data_->joint_group_model.item(i);
@@ -491,13 +396,11 @@ void TesseractSetupWizard::onJointValue(const QString &joint_name, double joint_
       break;
     }
   }
-  this->data_->thor->getEnvironment()->setState({joint_name.toStdString()}, {joint_value});
-  this->data_->update_transforms = true;
+  this->data_->render_util.setTesseractState({joint_name.toStdString()}, {joint_value});
 }
 
 void TesseractSetupWizard::onAddUserDefinedJointState(const QString &group_name, const QString &state_name)
 {
-  CONSOLE_BRIDGE_logError("onAddUserDefinedJointState");
   if (!group_name.trimmed().isEmpty() && !state_name.trimmed().isEmpty())
   {
     QStringList joint_names;
@@ -514,7 +417,6 @@ void TesseractSetupWizard::onAddUserDefinedJointState(const QString &group_name,
 
 void TesseractSetupWizard::onRemoveUserDefinedJointState(int index)
 {
-  CONSOLE_BRIDGE_logError("onRemoveUserDefinedJointState");
   this->data_->user_joint_states_model.removeRow(index);
 }
 
@@ -523,7 +425,6 @@ void TesseractSetupWizard::onAddUserDefinedTCP(const QString &group_name,
                                                const QVector3D& position,
                                                const QVector3D& orientation)
 {
-  CONSOLE_BRIDGE_logError("onAddUserDefinedTCP");
   if (!group_name.trimmed().isEmpty() && !tcp_name.trimmed().isEmpty())
     this->data_->user_tcp_model.add(group_name, tcp_name, position, orientation);
 
@@ -531,7 +432,6 @@ void TesseractSetupWizard::onAddUserDefinedTCP(const QString &group_name,
 
 void TesseractSetupWizard::onRemoveUserDefinedTCP(int index)
 {
-  CONSOLE_BRIDGE_logError("onRemoveUserDefinedTCP");
   this->data_->user_tcp_model.removeRow(index);
 }
 
@@ -541,14 +441,12 @@ void TesseractSetupWizard::onAddGroupOPWKinematics(const QString& group_name,
                                                    double o1, double o2, double o3, double o4, double o5, double o6,
                                                    int sc1, int sc2, int sc3, int sc4, int sc5, int sc6)
 {
-  CONSOLE_BRIDGE_logError("onAddGroupOPWKinematics");
   if (!group_name.trimmed().isEmpty())
     this->data_->opw_kinematics_model.add(group_name, a1, a2, b, c1, c2, c3, c4, o1, o2, o3, o4, o5, o6, sc1, sc2, sc3, sc4, sc5, sc6);
 }
 
 void TesseractSetupWizard::onRemoveGroupOPWKinematics(int index)
 {
-  CONSOLE_BRIDGE_logError("onRemoveGroupOPWKinematics");
   this->data_->opw_kinematics_model.removeRow(index);
 }
 
@@ -558,76 +456,14 @@ bool TesseractSetupWizard::eventFilter(QObject *_obj, QEvent *_event)
   {
     // This event is called in Scene3d's RenderThread, so it's safe to make
     // rendering calls here
-    this->updateTesseract();
+    if (!this->data_->render_util.isInitialized())
+      this->data_->render_util.init();
+
+    this->data_->render_util.update();
   }
 
   // Standard event processing
   return QObject::eventFilter(_obj, _event);
-}
-
-/////////////////////////////////////////////////
-void TesseractSetupWizard::updateTesseract()
-{
-  if (this->data_->load_environment)
-  {
-
-    // create scene
-    ignition::rendering::RenderEngine* engine = ignition::rendering::engine(this->data_->engine_name);
-    if (!engine)
-    {
-      ignerr << "Engine " << this->data_->engine_name.c_str() << " is not supported" << std::endl;
-      this->data_->load_environment = false;
-      return;
-    }
-
-    // Scene
-    if (!this->data_->scene)
-    {
-      this->data_->scene = engine->SceneByName(this->data_->scene_name);
-      if (!this->data_->scene)
-      {
-        igndbg << "Failed to get scene [" << this->data_->scene_name << "]" << std::endl;
-        if (engine->SceneCount() == 0)
-        {
-          this->data_->load_environment = false;
-          return;
-        }
-
-        this->data_->scene = engine->SceneByIndex(0);
-      }
-    }
-    else
-    {
-      this->data_->scene->Clear();
-      this->data_->axes.clear();
-    }
-
-    this->data_->entity_manager.clear();
-
-    // Load Ignition Scene
-    const tesseract_environment::EnvState::ConstPtr& state = this->data_->thor->getEnvironment()->getCurrentState();
-    toScene(*(this->data_->scene), this->data_->entity_manager, *(this->data_->thor->getEnvironmentConst()->getSceneGraph()), state->link_transforms);
-
-    // Add axis to scene
-    ignition::rendering::VisualPtr root = this->data_->scene->RootVisual();
-    unsigned id = static_cast<unsigned>(this->data_->entity_manager.addVisual("world_axis"));
-    ignition::rendering::AxisVisualPtr axis = this->data_->scene->CreateAxisVisual(id, "world_axis");
-    axis->Scale(0.5, 0.5, 0.5);
-    root->AddChild(axis);
-    this->data_->axes.push_back(axis);
-
-    this->data_->load_environment = false;
-  }
-  else if (this->data_->update_transforms)
-  {
-    const tesseract_environment::EnvState::ConstPtr& state = this->data_->thor->getEnvironment()->getCurrentState();
-    for (const auto& link : state->link_transforms)
-    {
-      ignition::rendering::VisualPtr v = this->data_->scene->VisualByName(link.first);
-      v->SetWorldPose(ignition::math::eigen3::convert(link.second));
-    }
-    this->data_->update_transforms = false;
-  }
 }
 
 void TesseractSetupWizard::removeGroupStates(const QString& group_name)

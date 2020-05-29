@@ -98,6 +98,12 @@ Item {
     }
 
     Connections {
+        target: acmTableView
+        onClicked: TesseractSetupWizard.onSelectionChangedACM(
+                       acmTableView.currentRow)
+    }
+
+    Connections {
         target: generateButton
         onClicked: TesseractSetupWizard.onGenerateACM(slider.value)
     }
