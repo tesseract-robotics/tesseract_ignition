@@ -96,7 +96,7 @@ void UserDefinedJointStatesModel::add(const QString& group_name,
   auto group = group_states.find(group_name.toStdString());
   bool add = true;
 
-  tesseract_scene_graph::SRDFModel::JointState state;
+  tesseract_scene_graph::JointState state;
   for (int i = 0; i < joint_names.size(); ++i)
     state[joint_names[i].toStdString()] = joint_values[i].toDouble();
 
@@ -110,7 +110,7 @@ void UserDefinedJointStatesModel::add(const QString& group_name,
   }
   else
   {
-    tesseract_scene_graph::SRDFModel::JointStates states;
+    tesseract_scene_graph::JointStates states;
     states[state_name.toStdString()] = state;
     group_states[group_name.toStdString()] = states;
   }

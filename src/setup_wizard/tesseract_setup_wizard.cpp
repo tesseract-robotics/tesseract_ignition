@@ -369,7 +369,7 @@ void TesseractSetupWizard::onRemoveACMEntry(int index)
   this->data_->acm_model.removeRow(index);
 }
 
-void TesseractSetupWizard::onClickedACMEntry(int index)
+void TesseractSetupWizard::onClickedACMEntry(int /*index*/)
 {
 //  this->data_->selected_entities.clear();
 //  this->data_->selected_entities.push_back(this->data_->entity_manager.getLink("link_1"));

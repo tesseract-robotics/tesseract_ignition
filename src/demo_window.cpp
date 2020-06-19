@@ -20,14 +20,17 @@ int main(int _argc, char **_argv)
     return 1;
   }
 
+  if (!app.LoadPlugin("TesseractSetupWizard"))
+  {
+    return 1;
+  }
+
   // Customize main window
   auto win = app.findChild<ignition::gui::MainWindow *>()->QuickWindow();
-  win->setProperty("title", "Hello Window!");
+  win->setProperty("title", "Tesseract Setup Wizard!");
 
   // Run window
   app.exec();
-
-  std::cout << "After run" << std::endl;
 
   return 0;
 }

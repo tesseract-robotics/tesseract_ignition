@@ -40,3 +40,21 @@ export IGN_GUI_PLUGIN_PATH=/home/larmstrong/catkin_ws/trajopt_only_ws/devel/lib/
 * How best to leverage gizmo's.
 * Is there any issue with using ROS 1 communication within a plugin.
   * The other way around is there an issue with using Transport library within a ros node.
+
+
+## Snap Creation
+
+* Install Snapcraft
+  * Need version 4.0 which is not release so use this command to get it `sudo snap refresh --candidate snapcraft`
+* Setup Workspace (This is already setup but the procedure is below.)
+  * Create directory snapcraft
+  * Create directory snapcraft/snap
+  * Create directory snapcraft/snap/local
+  * Create rosinstall snapcraft/snap/local/ignition_snap.rosinstall
+    * Create a rosinstall that pull all resources for your snap
+  * Create config snapcraft/snap/snapcraft.yaml
+* Build Snap
+  * 'cd snap && snapcraft --bind-ssh --enable-experimental-package-repositories`
+  * Notes:
+    * The `--build-ssh` allows access to your local ssh keys for pulling resources from our internal gitlab server.
+    * The `--enable-experimental-package-repositories` because we are using version 4.0 which has not been released.

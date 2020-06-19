@@ -137,7 +137,7 @@ void KinematicGroupsModel::add(const QString& group_name, const QString& type, c
 
       if (fwd_good || inv_good)
       {
-        tesseract_scene_graph::SRDFModel::ChainGroups& chain_groups = this->thor_->getSRDFModel()->getChainGroups();
+        tesseract_scene_graph::ChainGroups& chain_groups = this->thor_->getSRDFModel()->getChainGroups();
         chain_groups[group_name_trimmed.toStdString()] = {std::make_pair(data[0].toStdString(), data[1].toStdString())};
 
         auto item = new QStandardItem();
@@ -180,7 +180,7 @@ void KinematicGroupsModel::add(const QString& group_name, const QString& type, c
 
       if (fwd_good || inv_good)
       {
-        tesseract_scene_graph::SRDFModel::JointGroups& joint_groups = this->thor_->getSRDFModel()->getJointGroups();
+        tesseract_scene_graph::JointGroups& joint_groups = this->thor_->getSRDFModel()->getJointGroups();
         joint_groups[group_name_trimmed.toStdString()] = joints;
 
         auto item = new QStandardItem();
@@ -227,7 +227,7 @@ void KinematicGroupsModel::add(const QString& group_name, const QString& type, c
 
       if (fwd_good || inv_good)
       {
-        tesseract_scene_graph::SRDFModel::LinkGroups& link_groups = this->thor_->getSRDFModel()->getLinkGroups();
+        tesseract_scene_graph::LinkGroups& link_groups = this->thor_->getSRDFModel()->getLinkGroups();
         link_groups[group_name_trimmed.toStdString()] = links;
 
         auto item = new QStandardItem();
@@ -261,21 +261,21 @@ bool KinematicGroupsModel::removeRows(int row, int count, const QModelIndex &par
     QString type = row_item->data(KinematicGroupsRoles::TypeRole).toString();
     if (type == "Chain")
     {
-      tesseract_scene_graph::SRDFModel::ChainGroups& groups = this->thor_->getSRDFModel()->getChainGroups();
+      tesseract_scene_graph::ChainGroups& groups = this->thor_->getSRDFModel()->getChainGroups();
       thor_->getFwdKinematicsManager()->removeFwdKinematicSolver(group_name.toStdString());
       thor_->getInvKinematicsManager()->removeInvKinematicSolver(group_name.toStdString());
       groups.erase(group_name.toStdString());
     }
     else if (type == "Joint List")
     {
-      tesseract_scene_graph::SRDFModel::JointGroups& groups = this->thor_->getSRDFModel()->getJointGroups();
+      tesseract_scene_graph::JointGroups& groups = this->thor_->getSRDFModel()->getJointGroups();
       thor_->getFwdKinematicsManager()->removeFwdKinematicSolver(group_name.toStdString());
       thor_->getInvKinematicsManager()->removeInvKinematicSolver(group_name.toStdString());
       groups.erase(group_name.toStdString());
     }
     else if (type == "Link List")
     {
-      tesseract_scene_graph::SRDFModel::LinkGroups& groups = this->thor_->getSRDFModel()->getLinkGroups();
+      tesseract_scene_graph::LinkGroups& groups = this->thor_->getSRDFModel()->getLinkGroups();
       thor_->getFwdKinematicsManager()->removeFwdKinematicSolver(group_name.toStdString());
       thor_->getInvKinematicsManager()->removeInvKinematicSolver(group_name.toStdString());
       groups.erase(group_name.toStdString());

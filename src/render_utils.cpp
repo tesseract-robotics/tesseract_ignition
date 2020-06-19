@@ -527,10 +527,10 @@ namespace tesseract_ignition
   {
     if (!_node)
       return;
-    auto vis = std::dynamic_pointer_cast<ignition::rendering::Visual>(_node);
-    EntityID entityId = NULL_ENTITY_ID;
-    if (vis)
-      entityId = static_cast<int>(vis->Id());
+//    auto vis = std::dynamic_pointer_cast<ignition::rendering::Visual>(_node);
+//    EntityID entityId = NULL_ENTITY_ID;
+//    if (vis)
+//      entityId = static_cast<int>(vis->Id());
     // If the entity is not found in the existing map, create a wire box
 //    auto wireBoxIt = this->wireBoxes.find(entityId);
 //    if (wireBoxIt == this->wireBoxes.end())
@@ -574,10 +574,10 @@ namespace tesseract_ignition
   {
     if (!_node)
       return;
-    auto vis = std::dynamic_pointer_cast<ignition::rendering::Visual>(_node);
-    EntityID entityId = NULL_ENTITY_ID;
-    if (vis)
-      entityId = static_cast<int>(vis->Id());
+//    auto vis = std::dynamic_pointer_cast<ignition::rendering::Visual>(_node);
+//    EntityID entityId = NULL_ENTITY_ID;
+//    if (vis)
+//      entityId = static_cast<int>(vis->Id());
 
 //    if (this->wireBoxes.find(entityId) != this->wireBoxes.end())
 //    {
