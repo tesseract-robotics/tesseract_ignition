@@ -54,7 +54,11 @@ export IGN_GUI_PLUGIN_PATH=/home/larmstrong/catkin_ws/trajopt_only_ws/devel/lib/
     * Create a rosinstall that pull all resources for your snap
   * Create config snapcraft/snap/snapcraft.yaml
 * Build Snap
-  * 'cd snap && snapcraft --bind-ssh --enable-experimental-package-repositories`
+  * 'cd snapcraft'
+  * 'SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=16G snapcraft --bind-ssh --enable-experimental-package-repositories`
   * Notes:
     * The `--build-ssh` allows access to your local ssh keys for pulling resources from our internal gitlab server.
     * The `--enable-experimental-package-repositories` because we are using version 4.0 which has not been released.
+* Test Snap
+  * `snap install --dangerous --devmode tesseract_0.1_amd64.snap`
+* Upload to Snap Store

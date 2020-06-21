@@ -35,24 +35,42 @@ parts:
   get-ignition:
     plugin: nil
     build-packages:
-      - libignition-rendering3-dev
-      - libignition-gui3-dev
       - libignition-common3-dev
       - libignition-tools-dev
       - libignition-math6-eigen3-dev
+      - libsdformat9-dev
       - ruby-full
     stage-packages:
       - libignition-common3-dev
-      - libignition-rendering3-dev
-      - libignition-gui3-dev
       - libignition-tools-dev
       - libignition-math6-eigen3-dev
+      - libsdformat9-dev
       - ruby-full
 
   tesseract-workspace:
     plugin: catkin
     source: .
-    catkin-packages: [tesseract_ignition, tesseract, tesseract_collision, tesseract_common, tesseract_environment, tesseract_geometry, tesseract_kinematics, tesseract_scene_graph, tesseract_support, tesseract_urdf, tesseract_visualization, opw_kinematics, descartes_light, bullet3, fcl, libccd]
+    catkin-packages:
+      - tesseract_ignition
+      - tesseract
+      - tesseract_collision
+      - tesseract_common
+      - tesseract_environment
+      - tesseract_geometry
+      - tesseract_kinematics
+      - tesseract_scene_graph
+      - tesseract_support
+      - tesseract_urdf
+      - tesseract_visualization
+      - opw_kinematics
+      - descartes_light
+      - bullet3
+      - fcl
+      - libccd
+      - ignition_gui
+      - ignition_msgs
+      - ignition_sensors
+      - ignition_rendering
     include-roscore: false
     recursive-rosinstall: false
     rosinstall-files: [snap/local/ignition_snap.rosinstall]
@@ -88,4 +106,9 @@ parts:
 
 apps:
   tesseract-setup-wizard:
-    command: usr/bin/demo_window
+    extensions:
+      - kde-neon
+    environment:
+      IGN_GUI_PLUGIN_PATH: $SNAP/opt/ros/melodic/lib/
+      IGN_RENDERING_PLUGIN_PATH: $SNAP/usr/lib/x86_64-linux-gnu/
+    command: opt/ros/melodic/bin/demo_window

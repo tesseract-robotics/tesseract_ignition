@@ -26,3 +26,19 @@
     local-name: tesseract_ignition
     uri: git@mrtd-gitlab.dyn.datasys.swri.edu:larmstrong/tesseract_ignition.git
     version: master
+- git:
+    local-name: ignition_gui
+    uri: https://github.com/Levi-Armstrong/ign-gui.git
+    version: feature/PackageXML
+- git:
+    local-name: ignition_msgs
+    uri: https://github.com/Levi-Armstrong/ign-msgs.git
+    version: feature/PackageXML
+- git:
+    local-name: ignition_rendering
+    uri: https://github.com/Levi-Armstrong/ign-rendering.git
+    version: feature/PackageXML
+- git:
+    local-name: ignition_sensors
+    uri: https://github.com/Levi-Armstrong/ign-sensors.git
+    version: feature/PackageXML
