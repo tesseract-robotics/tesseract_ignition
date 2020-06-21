@@ -11,11 +11,11 @@ find_package(tesseract_visualization REQUIRED)
 find_package(tesseract REQUIRED)
 
 # Find ignition-gui
-find_package(ignition-gui3 REQUIRED)
+find_package(ignition-gui4 REQUIRED)
 find_package(ignition-common3 COMPONENTS profiler events av REQUIRED)
-find_package(ignition-rendering3 REQUIRED)
+find_package(ignition-rendering4 REQUIRED)
 find_package(ignition-transport8 REQUIRED)
-find_package(ignition-msgs5 REQUIRED)
+find_package(ignition-msgs6 REQUIRED)
 find_package(Qt5 COMPONENTS Core Quick QuickControls2 REQUIRED)
 
 set(COVERAGE_EXCLUDE /usr/* /opt/* ${CMAKE_CURRENT_LIST_DIR}/test/* /*/gtest/*)
@@ -208,6 +208,6 @@ tesseract_configure_package(
 # Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}
   DESTINATION include
-  FILES_MATCHING PATTERN "*.h"
+  FILES_MATCHING PATTERN "*.h" PATTERN "*.qml" PATTERN "*.qrc"
   PATTERN ".svn" EXCLUDE
 )

@@ -38,13 +38,39 @@ parts:
       - libignition-common3-dev
       - libignition-tools-dev
       - libignition-math6-eigen3-dev
+      - libignition-cmake2-dev
+      - libignition-plugin-dev
+      - libignition-transport8-dev
       - libsdformat9-dev
+      - libprotobuf-dev
+      - protobuf-compiler
+      - libprotoc-dev
+      - libglew-dev
+      - libfreeimage-dev
+      - freeglut3-dev
+      - libxmu-dev
+      - libxi-dev
+      - libogre-1.9-dev
+      - libogre-2.1-dev
       - ruby-full
     stage-packages:
       - libignition-common3-dev
       - libignition-tools-dev
       - libignition-math6-eigen3-dev
+      - libignition-cmake2-dev
+      - libignition-plugin-dev
+      - libignition-transport8-dev
       - libsdformat9-dev
+      - libprotobuf-dev
+      - protobuf-compiler
+      - libprotoc-dev
+      - libglew-dev
+      - libfreeimage-dev
+      - freeglut3-dev
+      - libxmu-dev
+      - libxi-dev
+      - libogre-1.9-dev
+      - libogre-2.1-dev
       - ruby-full
 
   tesseract-workspace:
@@ -81,6 +107,9 @@ parts:
       - libpcl-dev
       - liboctomap-dev
       - git
+      - qtbase5-dev
+      - qtdeclarative5-dev
+      - qtquickcontrols2-5-dev
     stage-packages:
       - libaec0
       - libcurl3-gnutls
