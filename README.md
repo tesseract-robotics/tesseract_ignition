@@ -62,3 +62,5 @@ export IGN_GUI_PLUGIN_PATH=/home/larmstrong/catkin_ws/trajopt_only_ws/devel/lib/
 * Test Snap
   * `snap install --dangerous --devmode tesseract_0.1_amd64.snap`
 * Upload to Snap Store
+* Notes:
+  * Sometimes paths are hardcoded in software based on when they are build causing issues when bundling. This can be addressed leveraging [snap-layouts](https://snapcraft.io/docs/snap-layouts).

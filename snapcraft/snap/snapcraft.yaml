@@ -110,6 +110,7 @@ parts:
       - qtbase5-dev
       - qtdeclarative5-dev
       - qtquickcontrols2-5-dev
+      - qml-module-qtquick-controls
     stage-packages:
       - libaec0
       - libcurl3-gnutls
@@ -128,6 +129,7 @@ parts:
       - libtinyxml2.6.2v5
       - libusb-1.0-0
       - libvtk6.3
+      - libslang2
 
 #  stage:
 #    # stage everything EXCEPT (note the minuses that make this a blacklist)
@@ -139,5 +141,6 @@ apps:
       - kde-neon
     environment:
       IGN_GUI_PLUGIN_PATH: $SNAP/opt/ros/melodic/lib/
-      IGN_RENDERING_PLUGIN_PATH: $SNAP/usr/lib/x86_64-linux-gnu/
+      IGN_RENDERING_PLUGIN_PATH: $SNAP/opt/ros/melodic/lib/
+      IGN_RENDERING_RESOURCE_PATH: $SNAP/opt/ros/melodic/share/ignition/ignition-rendering4/
     command: opt/ros/melodic/bin/demo_window

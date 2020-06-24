@@ -14,6 +14,10 @@ int main(int _argc, char **_argv)
   // Create app
   ignition::gui::Application app(_argc, _argv);
 
+  // Set orginization information for QSettings
+  app.setOrganizationName("Southwest Research Institute");
+  app.setOrganizationDomain("SwRI");
+
   // Load plugins / config
   if (!app.LoadPlugin("TesseractScene3D"))
   {
