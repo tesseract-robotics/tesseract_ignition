@@ -143,4 +143,5 @@ apps:
       IGN_GUI_PLUGIN_PATH: $SNAP/opt/ros/melodic/lib/
       IGN_RENDERING_PLUGIN_PATH: $SNAP/opt/ros/melodic/lib/
       IGN_RENDERING_RESOURCE_PATH: $SNAP/opt/ros/melodic/share/ignition/ignition-rendering4/
+      OGRE_RESOURCE_PATH: $SNAP/usr/lib/x86_64-linux-gnu/OGRE-1.9.0/
     command: opt/ros/melodic/bin/demo_window
