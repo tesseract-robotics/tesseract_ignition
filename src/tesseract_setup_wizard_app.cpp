@@ -18,16 +18,12 @@ int main(int _argc, char **_argv)
   app.setOrganizationName("Southwest Research Institute");
   app.setOrganizationDomain("SwRI");
 
-  // Load plugins / config
-  if (!app.LoadPlugin("TesseractScene3D"))
-  {
-    return 1;
-  }
+  const char *env = std::getenv("TSW_CONFIG_PATH");
+    std::string tsw_config_path = (env) ? std::string(env) :
+        TSW_CONFIG_PATH;
 
-  if (!app.LoadPlugin("TesseractSetupWizard"))
-  {
+  if (!app.LoadConfig(tsw_config_path))
     return 1;
-  }
 
   // Customize main window
   auto win = app.findChild<ignition::gui::MainWindow *>()->QuickWindow();

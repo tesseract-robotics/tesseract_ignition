@@ -143,5 +143,6 @@ apps:
       IGN_GUI_PLUGIN_PATH: $SNAP/opt/ros/melodic/lib/
       IGN_RENDERING_PLUGIN_PATH: $SNAP/opt/ros/melodic/lib/
       IGN_RENDERING_RESOURCE_PATH: $SNAP/opt/ros/melodic/share/ignition/ignition-rendering4/
-      OGRE_RESOURCE_PATH: $SNAP/usr/lib/x86_64-linux-gnu/OGRE-1.9.0/
-    command: opt/ros/melodic/bin/demo_window
+      OGRE_RESOURCE_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0/
+      TSW_CONFIG_PATH: $SNAP/opt/ros/melodic/share/tesseract_ignition/config/setup_wizard.config
+    command: opt/ros/melodic/bin/tesseract_setup_wizard_app

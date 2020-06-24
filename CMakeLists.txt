@@ -163,15 +163,16 @@ target_include_directories(TesseractIgnitionVisualization SYSTEM PUBLIC
     ${IGNITION-TRANSPORT_INCLUDE_DIRS}
     ${IGNITION-MSGS_INCLUDE_DIRS})
 
-add_executable(demo_window src/demo_window.cpp)
-target_link_libraries(demo_window PUBLIC ${IGNITION-COMMON_LIBRARIES} ${IGNITION-GUI_LIBRARIES} ${IGNITION-RENDERING_LIBRARIES} Qt5::Core Qt5::Quick Qt5::QuickControls2)
-target_include_directories(demo_window PUBLIC
+add_executable(tesseract_setup_wizard_app src/tesseract_setup_wizard_app.cpp)
+target_link_libraries(tesseract_setup_wizard_app PUBLIC ${IGNITION-COMMON_LIBRARIES} ${IGNITION-GUI_LIBRARIES} ${IGNITION-RENDERING_LIBRARIES} Qt5::Core Qt5::Quick Qt5::QuickControls2)
+target_include_directories(tesseract_setup_wizard_app PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include>")
-  target_include_directories(demo_window SYSTEM PUBLIC
-      ${IGNITION-GUI_INCLUDE_DIRS}
-      ${IGNITION-COMMON_INCLUDE_DIRS}
-      ${IGNITION-RENDERING_INCLUDE_DIRS})
+target_include_directories(tesseract_setup_wizard_app SYSTEM PUBLIC
+    ${IGNITION-GUI_INCLUDE_DIRS}
+    ${IGNITION-COMMON_INCLUDE_DIRS}
+    ${IGNITION-RENDERING_INCLUDE_DIRS})
+target_compile_definitions(tesseract_setup_wizard_app PRIVATE TSW_CONFIG_PATH="${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/config/setup_wizard.config")
 
 add_executable(demo_dialog src/demo_dialog.cpp)
 target_link_libraries(demo_dialog PUBLIC ${IGNITION-COMMON_LIBRARIES} ${IGNITION-GUI_LIBRARIES} ${IGNITION-RENDERING_LIBRARIES} Qt5::Core Qt5::Quick Qt5::QuickControls2)
@@ -201,7 +202,7 @@ tesseract_configure_package(
   TesseractVideoRecorder
   TesseractIgnitionVisualization
   TesseractSetupWizard
-  demo_window
+  tesseract_setup_wizard_app
   demo_dialog
   demo_tesseract)
 
@@ -211,3 +212,5 @@ install(DIRECTORY include/${PROJECT_NAME}
   FILES_MATCHING PATTERN "*.h" PATTERN "*.qml" PATTERN "*.qrc"
   PATTERN ".svn" EXCLUDE
 )
+
+install(DIRECTORY config/ DESTINATION share/${PROJECT_NAME}/config)
