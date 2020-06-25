@@ -41,6 +41,18 @@ std::string locateResource(const std::string& url)
         if (d.exists())
           cache_package_paths[d.dirName().toStdString()] = token;
       }
+
+      // This was added to allow user defined resource path
+      // When using this within a snap you can map host ros package paths to this environment variable
+      char* tsw_resource_paths = std::getenv("TSW_RESOURCE_PATH");
+      tokens.clear();
+      boost::split(tokens, tsw_resource_paths, boost::is_any_of(":"), boost::token_compress_on);
+      for (const auto& token : tokens)
+      {
+        QDir d(QString::fromStdString(token));
+        if (d.exists())
+          cache_package_paths[d.dirName().toStdString()] = token;
+      }
     }
     auto find_package = cache_package_paths.find(package);
 
