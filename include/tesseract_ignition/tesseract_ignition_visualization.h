@@ -51,6 +51,12 @@ public:
   void plotTrajectory(const std::vector<std::string>& joint_names, const Eigen::Ref<const tesseract_common::TrajArray>& traj) override;
 
   /**
+   * @brief Plot a JointTrajectory
+   * @param trajectory JointTrajectory to be plotted
+   */
+  void plotTrajectory(const tesseract_common::JointTrajectory& traj) override;
+
+  /**
    * @brief Plot the collision results data
    * @param link_names List of link names for which to plot data
    * @param dist_results The collision results data

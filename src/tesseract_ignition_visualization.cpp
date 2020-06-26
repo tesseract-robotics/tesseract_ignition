@@ -89,6 +89,11 @@ void TesseractIgnitionVisualization::plotTrajectory(const std::vector<std::strin
   }
 }
 
+void TesseractIgnitionVisualization::plotTrajectory(const tesseract_common::JointTrajectory& traj)
+{
+  plotTrajectory(traj.joint_names, traj.trajectory);
+}
+
 void addArrow(EntityManager& entity_manager,
               ignition::msgs::Link& link,
               long& sub_index,
