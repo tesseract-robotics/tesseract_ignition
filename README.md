@@ -60,9 +60,9 @@ export IGN_GUI_PLUGIN_PATH=/home/larmstrong/catkin_ws/trajopt_only_ws/devel/lib/
     * The `--build-ssh` allows access to your local ssh keys for pulling resources from our internal gitlab server.
     * The `--enable-experimental-package-repositories` because we are using version 4.0 which has not been released.
 * Test Snap
-  * `snap install --dangerous --devmode tesseract_0.1_amd64.snap`
+  * `snap install --dangerous --devmode tesseract-ignition_0.1_amd64.snap`
   * tesseract.tesseract-setup-wizard
 * Upload to Snap Store
 * Notes:
   * Sometimes paths are hardcoded in software based on when they are build causing issues when bundling. This can be addressed leveraging [snap-layouts](https://snapcraft.io/docs/snap-layouts).
-  * The `snap run --shell <command>` example `snap run --shell tesseract.tesseract-setup-wizard` thing is a super useful way to test out the confinement profile of a given command, I use it all the time.It just opens a shell instead of running the command.
+  * The `snap run --shell <command>` example `snap run --shell tesseract-ignition.tesseract-setup-wizard` thing is a super useful way to test out the confinement profile of a given command, I use it all the time.It just opens a shell instead of running the command.
