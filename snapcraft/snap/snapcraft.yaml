@@ -1,6 +1,6 @@
 name: tesseract-ignition # you probably want to 'snapcraft register <name>'
 base: core18 # the base snap is the execution environment for this snap
-version: '0.1' # just for humans, typically '1.2+git' or '1.3.2'
+version: '0.2' # just for humans, typically '1.2+git' or '1.3.2'
 summary: Tesseract Ignition
 description: |
   This current contains the Tesseract Setup Wizard.
@@ -111,6 +111,8 @@ parts:
       - qtdeclarative5-dev
       - qtquickcontrols2-5-dev
       - qml-module-qtquick-controls
+      - mesa-utils
+      - libgl1-mesa-glx
     stage-packages:
       - libaec0
       - libcurl3-gnutls
@@ -130,6 +132,8 @@ parts:
       - libusb-1.0-0
       - libvtk6.3
       - libslang2
+      - mesa-utils
+      - libgl1-mesa-glx
 
 #  stage:
 #    # stage everything EXCEPT (note the minuses that make this a blacklist)

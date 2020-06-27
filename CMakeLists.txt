@@ -164,7 +164,12 @@ target_include_directories(TesseractIgnitionVisualization SYSTEM PUBLIC
     ${IGNITION-MSGS_INCLUDE_DIRS})
 
 add_executable(tesseract_setup_wizard_app src/tesseract_setup_wizard_app.cpp)
-target_link_libraries(tesseract_setup_wizard_app PUBLIC ${IGNITION-COMMON_LIBRARIES} ${IGNITION-GUI_LIBRARIES} ${IGNITION-RENDERING_LIBRARIES} Qt5::Core Qt5::Quick Qt5::QuickControls2)
+target_link_libraries(tesseract_setup_wizard_app PUBLIC
+  ${PROJECT_NAME}
+  ${IGNITION-COMMON_LIBRARIES}
+  ${IGNITION-GUI_LIBRARIES}
+  ${IGNITION-RENDERING_LIBRARIES}
+  Qt5::Core Qt5::Quick Qt5::QuickControls2)
 target_include_directories(tesseract_setup_wizard_app PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include>")

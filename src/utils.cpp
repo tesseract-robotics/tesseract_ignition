@@ -1,5 +1,8 @@
 #include <tesseract_ignition/utils.h>
 #include <unordered_map>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <QDir>
 
 static std::unordered_map<std::string, std::string> cache_package_paths;
 

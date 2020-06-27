@@ -63,6 +63,8 @@ export IGN_GUI_PLUGIN_PATH=/home/larmstrong/catkin_ws/trajopt_only_ws/devel/lib/
   * `snap install --dangerous --devmode tesseract-ignition_0.1_amd64.snap`
   * tesseract.tesseract-setup-wizard
 * Upload to Snap Store
+  * snapcraft login
+  * snapcraft push tesseract-ignition_0.1_amd64.snap
 * Notes:
   * Sometimes paths are hardcoded in software based on when they are build causing issues when bundling. This can be addressed leveraging [snap-layouts](https://snapcraft.io/docs/snap-layouts).
   * The `snap run --shell <command>` example `snap run --shell tesseract-ignition.tesseract-setup-wizard` thing is a super useful way to test out the confinement profile of a given command, I use it all the time.It just opens a shell instead of running the command.

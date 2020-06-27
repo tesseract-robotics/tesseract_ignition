@@ -87,9 +87,6 @@ namespace tesseract_ignition
     void setTesseractState(const std::vector<std::string>& joint_names,
                            const Eigen::Ref<const Eigen::VectorXd>& joint_values);
 
-    /** @brief Locate a resource */
-    tesseract_common::Resource::Ptr locateResource(const std::string& resource) const;
-
 //    /// \brief Count of pending sensors. Must be called in the rendering thread.
 //    /// \return Number of sensors to be added on the next `Update` call
 //    ///

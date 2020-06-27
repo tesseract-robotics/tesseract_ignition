@@ -185,7 +185,7 @@ void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& s
 
 void TesseractSetupWizard::onSave(const QString& srdf_filepath)
 {
-  std::string local_path = this->data_->render_util.locateResource(srdf_filepath.toStdString())->getFilePath();
+  std::string local_path = this->data_->locator->locateResource(srdf_filepath.toStdString())->getFilePath();
   this->data_->render_util.getTesseract()->getSRDFModelConst()->saveToFile(local_path);
 }
 
