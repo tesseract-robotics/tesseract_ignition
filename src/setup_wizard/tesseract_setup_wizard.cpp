@@ -120,14 +120,21 @@ void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& s
   auto thor = std::make_shared<tesseract::Tesseract>();
   this->data_->locator = std::make_shared<tesseract_scene_graph::SimpleResourceLocator>(tesseract_ignition::locateResource);
   this->data_->urdf_filepath = this->data_->locator->locateResource(urdf_filepath.toStdString())->getFilePath();
+  bool loaded = false;
   if (srdf_filepath.toStdString().empty())
   {
-    thor->init(boost::filesystem::path(this->data_->urdf_filepath), this->data_->locator);
+    loaded = !thor->init(boost::filesystem::path(this->data_->urdf_filepath), this->data_->locator);
   }
   else
   {
     this->data_->srdf_filepath = this->data_->locator->locateResource(srdf_filepath.toStdString())->getFilePath();
-    thor->init(boost::filesystem::path(this->data_->urdf_filepath), boost::filesystem::path(this->data_->srdf_filepath), this->data_->locator);
+    loaded = thor->init(boost::filesystem::path(this->data_->urdf_filepath), boost::filesystem::path(this->data_->srdf_filepath), this->data_->locator);
+  }
+
+  if (!loaded)
+  {
+    ignerr << "Failed to parse URDF/SRDF!" << std::endl;
+    return;
   }
 
   this->data_->render_util.setTesseract(thor);
