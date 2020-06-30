@@ -24,7 +24,7 @@
     version: master
 - git:
     local-name: tesseract_ignition
-    uri: git@mrtd-gitlab.dyn.datasys.swri.edu:larmstrong/tesseract_ignition.git
+    uri: https://github.com/Levi-Armstrong/tesseract_ignition.git
     version: master
 - git:
     local-name: ignition_gui
