@@ -30,18 +30,6 @@ For ignition to find the plugins built by this package you must set the followin
 export IGN_GUI_PLUGIN_PATH=/home/larmstrong/catkin_ws/trajopt_only_ws/devel/lib/
 ```
 
-## Questions
-
-* How best to layout things out since everything is plugins.
-* I assume you should use Transport to communicate between plugins?
-* Does the Scene keep a change history?
-* Currently the SceneManager publishes the scene but is there any reason not to expose services to modify the scene?
-  * Also is there any examples of populating a Scene Message?
-* How best to leverage gizmo's.
-* Is there any issue with using ROS 1 communication within a plugin.
-  * The other way around is there an issue with using Transport library within a ros node.
-
-
 ## Snap Creation
 
 * Install Snapcraft
