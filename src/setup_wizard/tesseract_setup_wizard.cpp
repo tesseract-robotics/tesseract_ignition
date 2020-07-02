@@ -123,7 +123,7 @@ void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& s
   bool loaded = false;
   if (srdf_filepath.toStdString().empty())
   {
-    loaded = !thor->init(boost::filesystem::path(this->data_->urdf_filepath), this->data_->locator);
+    loaded = thor->init(boost::filesystem::path(this->data_->urdf_filepath), this->data_->locator);
   }
   else
   {
