@@ -6,7 +6,7 @@ description: |
   This current contains the Tesseract Setup Wizard.
 
 grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+confinement: classic # use 'strict' once you have the right plugs and slots
 
 # This is only available in snap verions 4.0 and greater
 package-repositories:
@@ -72,6 +72,7 @@ parts:
       - libogre-1.9-dev
       - libogre-2.1-dev
       - ruby-full
+      - libslang2
 
   tesseract-workspace:
     plugin: catkin
@@ -131,9 +132,15 @@ parts:
       - libtinyxml2.6.2v5
       - libusb-1.0-0
       - libvtk6.3
-      - libslang2
       - mesa-utils
       - libgl1-mesa-glx
+      - libdouble-conversion1
+      - libqt5core5a
+      - libqt5gui5
+      - libqt5network5
+      - libqt5qml5
+      - libqt5quick5
+      - libqt5widgets5
 
 #  stage:
 #    # stage everything EXCEPT (note the minuses that make this a blacklist)
@@ -141,8 +148,13 @@ parts:
 
 apps:
   tesseract-setup-wizard:
-    extensions:
-      - kde-neon
+    plugs:
+        - desktop
+        - desktop-legacy
+        - wayland
+        - home
+        - network
+        - opengl
     environment:
       IGN_GUI_PLUGIN_PATH: $SNAP/opt/ros/melodic/lib/
       IGN_RENDERING_PLUGIN_PATH: $SNAP/opt/ros/melodic/lib/
