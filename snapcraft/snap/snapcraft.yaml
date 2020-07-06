@@ -1,6 +1,6 @@
 name: tesseract-ignition # you probably want to 'snapcraft register <name>'
 base: core18 # the base snap is the execution environment for this snap
-version: '0.2' # just for humans, typically '1.2+git' or '1.3.2'
+version: '0.4' # just for humans, typically '1.2+git' or '1.3.2'
 summary: Tesseract Ignition
 description: |
   This current contains the Tesseract Setup Wizard.
@@ -146,6 +146,10 @@ parts:
 #    # stage everything EXCEPT (note the minuses that make this a blacklist)
 #    - -usr/include/my/headers/
 
+plugs:
+  ros-plug:
+    interface: system-files
+    read: [/opt/ros]
 apps:
   tesseract-setup-wizard:
     plugs:
@@ -155,6 +159,7 @@ apps:
         - home
         - network
         - opengl
+        - ros-plug
     environment:
       IGN_GUI_PLUGIN_PATH: $SNAP/opt/ros/melodic/lib/
       IGN_RENDERING_PLUGIN_PATH: $SNAP/opt/ros/melodic/lib/
