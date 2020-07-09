@@ -48,8 +48,13 @@ export IGN_GUI_PLUGIN_PATH=/home/larmstrong/catkin_ws/trajopt_only_ws/devel/lib/
     * The `--build-ssh` allows access to your local ssh keys for pulling resources from our internal gitlab server.
     * The `--enable-experimental-package-repositories` because we are using version 4.0 which has not been released.
 * Test Snap
-  * `snap install --dangerous --classic tesseract-ignition_0.1_amd64.snap`
+  * `snap install --dangerous --classic tesseract-ignition_X.X_amd64.snap`
   * tesseract.tesseract-setup-wizard
+* Use with ROS workspace
+  * source workspace
+  * TSW_RESOURCE_PATH=$ROS_PACKAGE_PATH tesseract-ignition.tesseract-setup-wizard
+  * Note: This is required because the snap package needs to know where to find ros packages on the host machine. It
+          leverages TSW_RESOURCE_PATH to do this.
 * Upload to Snap Store
   * snapcraft login
   * snapcraft upload tesseract-ignition_X.X_amd64.snap --release [stable | candidate | beta | edge]
