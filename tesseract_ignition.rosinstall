@@ -22,3 +22,7 @@
     local-name: ifopt
     uri: https://github.com/ethz-adrl/ifopt.git
     version: master
+- git:
+    local-name: cmake_common_scripts
+    uri: https://github.com/ros-industrial/cmake_common_scripts.git
+    version: master
