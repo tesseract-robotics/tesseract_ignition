@@ -160,7 +160,7 @@ parts:
 plugs:
   ros-plug:
     interface: system-files
-    read: [/opt/ros]
+    read: [/var/lib/snapd/hostfs/opt/ros]
 apps:
   tesseract-setup-wizard:
     extensions:
@@ -180,4 +180,4 @@ apps:
       IGN_RENDERING_RESOURCE_PATH: $SNAP/opt/ros/melodic/share/ignition/ignition-rendering4/
       OGRE_RESOURCE_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/OGRE-1.9.0/
       TSW_CONFIG_PATH: $SNAP/opt/ros/melodic/share/tesseract_ignition/config/setup_wizard.config
-    command: bin/desktop-launch $SNAP/opt/ros/melodic/bin/tesseract_setup_wizard_app
+    command: unset ROS_PACKAGE_PATH && bin/desktop-launch $SNAP/opt/ros/melodic/bin/tesseract_setup_wizard_app
