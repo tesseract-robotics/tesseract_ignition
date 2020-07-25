@@ -15,7 +15,7 @@ find_package(ignition-gui4 REQUIRED)
 find_package(ignition-common3 COMPONENTS profiler events av REQUIRED)
 find_package(ignition-rendering4 REQUIRED)
 find_package(ignition-transport8 REQUIRED)
-find_package(ignition-msgs6 REQUIRED)
+find_package(ignition-msgs5 REQUIRED)
 find_package(Qt5 COMPONENTS Core Quick QuickControls2 REQUIRED)
 
 set(COVERAGE_EXCLUDE /usr/* /opt/* ${CMAKE_CURRENT_LIST_DIR}/test/* /*/gtest/*)
@@ -51,6 +51,8 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
     ${IGNITION-COMMON_INCLUDE_DIRS}
     ${IGNITION-RENDERING_INCLUDE_DIRS}
     ${IGNITION-MSGS_INCLUDE_DIRS})
+
+message(WARNING ${IGNITION-MSGS_INCLUDE_DIRS})
 
 QT5_WRAP_CPP(TesseractScene3D_headers_MOC include/tesseract_ignition/scene3d/tesseract_scene3d.h)
 QT5_ADD_RESOURCES(TesseractScene3D_resources_RCC include/tesseract_ignition/scene3d/TesseractScene3D.qrc)
@@ -179,6 +181,22 @@ target_include_directories(tesseract_setup_wizard_app SYSTEM PUBLIC
     ${IGNITION-RENDERING_INCLUDE_DIRS})
 target_compile_definitions(tesseract_setup_wizard_app PRIVATE TSW_CONFIG_PATH="${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/config/setup_wizard.config")
 
+add_executable(tesseract_visualization_app src/tesseract_visualization_app.cpp)
+target_link_libraries(tesseract_visualization_app PUBLIC
+  ${PROJECT_NAME}
+  ${IGNITION-COMMON_LIBRARIES}
+  ${IGNITION-GUI_LIBRARIES}
+  ${IGNITION-RENDERING_LIBRARIES}
+  Qt5::Core Qt5::Quick Qt5::QuickControls2)
+target_include_directories(tesseract_visualization_app PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<INSTALL_INTERFACE:include>")
+target_include_directories(tesseract_visualization_app SYSTEM PUBLIC
+    ${IGNITION-GUI_INCLUDE_DIRS}
+    ${IGNITION-COMMON_INCLUDE_DIRS}
+    ${IGNITION-RENDERING_INCLUDE_DIRS})
+target_compile_definitions(tesseract_visualization_app PRIVATE TSW_CONFIG_PATH="${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/config/visualization.config")
+
 add_executable(demo_dialog src/demo_dialog.cpp)
 target_link_libraries(demo_dialog PUBLIC ${IGNITION-COMMON_LIBRARIES} ${IGNITION-GUI_LIBRARIES} ${IGNITION-RENDERING_LIBRARIES} Qt5::Core Qt5::Quick Qt5::QuickControls2)
 target_include_directories(demo_dialog PUBLIC
@@ -208,6 +226,7 @@ tesseract_configure_package(
   TesseractIgnitionVisualization
   TesseractSetupWizard
   tesseract_setup_wizard_app
+  tesseract_visualization_app
   demo_dialog
   demo_tesseract)
 

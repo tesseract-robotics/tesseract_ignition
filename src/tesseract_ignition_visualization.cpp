@@ -100,7 +100,7 @@ void addArrow(EntityManager& entity_manager,
               const std::string& parent_name,
               const Eigen::Ref<const Eigen::Vector3d>& pt1,
               const Eigen::Ref<const Eigen::Vector3d>& pt2,
-              const Eigen::Ref<const Eigen::Vector4d>& /*rgba*/,
+              const Eigen::Ref<const Eigen::Vector4d>& rgba,
               double radius)
 {
   std::string gv_name = parent_name + "_" + std::to_string(++sub_index);
@@ -110,15 +110,15 @@ void addArrow(EntityManager& entity_manager,
 
   Eigen::Isometry3d pose = Eigen::Isometry3d::Identity();
   Eigen::Vector3d x, y, z;
-  x = (pt2 - pt1).normalized();
-  pose.translation() = x;
-  y = x.unitOrthogonal();
-  z = (x.cross(y)).normalized();
+  z = (pt2 - pt1).normalized();
+  y = z.unitOrthogonal();
+  x = (y.cross(z)).normalized();
   Eigen::Matrix3d rot;
   rot.col(0) = x;
   rot.col(1) = y;
   rot.col(2) = z;
   pose.linear() = rot;
+  pose.translation() = pt1 + (((pt2 - pt1).norm() / 2) * z);
 
   gv_msg->mutable_pose()->CopyFrom(ignition::msgs::Convert(ignition::math::eigen3::convert(pose)));
 
@@ -127,16 +127,15 @@ void addArrow(EntityManager& entity_manager,
   ignition::msgs::CylinderGeom shape_geometry_msg;
   shape_geometry_msg.set_radius(radius);
   shape_geometry_msg.set_length((pt2 - pt1).norm());
-  geometry_msg.mutable_sphere()->CopyFrom(shape_geometry_msg);
+  geometry_msg.mutable_cylinder()->CopyFrom(shape_geometry_msg);
   gv_msg->mutable_geometry()->CopyFrom(geometry_msg);
-//          gv_msg.mutable_material()
+  ignition::msgs::Material shape_material_msg;
+  shape_material_msg.mutable_diffuse()->set_r(static_cast<float>(rgba(0)));
+  shape_material_msg.mutable_diffuse()->set_g(static_cast<float>(rgba(1)));
+  shape_material_msg.mutable_diffuse()->set_b(static_cast<float>(rgba(2)));
+  shape_material_msg.mutable_diffuse()->set_a(static_cast<float>(rgba(3)));
+  gv_msg->mutable_material()->CopyFrom(shape_material_msg);
   gv_msg->set_parent_name(parent_name);
-
-//    marker.color.r = static_cast<float>(rgba(0));
-//    marker.color.g = static_cast<float>(rgba(1));
-//    marker.color.b = static_cast<float>(rgba(2));
-//    marker.color.a = static_cast<float>(rgba(3));
-
 }
 
 void addCylinder(EntityManager& entity_manager,
@@ -145,7 +144,7 @@ void addCylinder(EntityManager& entity_manager,
                  const std::string& parent_name,
                  const Eigen::Ref<const Eigen::Vector3d>& pt1,
                  const Eigen::Ref<const Eigen::Vector3d>& pt2,
-                 const Eigen::Ref<const Eigen::Vector4d>& /*rgba*/,
+                 const Eigen::Ref<const Eigen::Vector4d>& rgba,
                  double radius)
 {
   std::string gv_name = parent_name + "_" + std::to_string(++sub_index);
@@ -155,15 +154,15 @@ void addCylinder(EntityManager& entity_manager,
 
   Eigen::Isometry3d pose = Eigen::Isometry3d::Identity();
   Eigen::Vector3d x, y, z;
-  x = (pt2 - pt1).normalized();
-  pose.translation() = x;
-  y = x.unitOrthogonal();
-  z = (x.cross(y)).normalized();
+  z = (pt2 - pt1).normalized();
+  y = z.unitOrthogonal();
+  x = (y.cross(z)).normalized();
   Eigen::Matrix3d rot;
   rot.col(0) = x;
   rot.col(1) = y;
   rot.col(2) = z;
   pose.linear() = rot;
+  pose.translation() = pt1 + (((pt2 - pt1).norm() / 2) * z);
 
   gv_msg->mutable_pose()->CopyFrom(ignition::msgs::Convert(ignition::math::eigen3::convert(pose)));
 
@@ -172,15 +171,15 @@ void addCylinder(EntityManager& entity_manager,
   ignition::msgs::CylinderGeom shape_geometry_msg;
   shape_geometry_msg.set_radius(radius);
   shape_geometry_msg.set_length((pt2 - pt1).norm());
-  geometry_msg.mutable_sphere()->CopyFrom(shape_geometry_msg);
+  geometry_msg.mutable_cylinder()->CopyFrom(shape_geometry_msg);
   gv_msg->mutable_geometry()->CopyFrom(geometry_msg);
-//          gv_msg.mutable_material()
+  ignition::msgs::Material shape_material_msg;
+  shape_material_msg.mutable_diffuse()->set_r(static_cast<float>(rgba(0)));
+  shape_material_msg.mutable_diffuse()->set_g(static_cast<float>(rgba(1)));
+  shape_material_msg.mutable_diffuse()->set_b(static_cast<float>(rgba(2)));
+  shape_material_msg.mutable_diffuse()->set_a(static_cast<float>(rgba(3)));
+  gv_msg->mutable_material()->CopyFrom(shape_material_msg);
   gv_msg->set_parent_name(parent_name);
-
-//    marker.color.r = static_cast<float>(rgba(0));
-//    marker.color.g = static_cast<float>(rgba(1));
-//    marker.color.b = static_cast<float>(rgba(2));
-//    marker.color.a = static_cast<float>(rgba(3));
 }
 
 void TesseractIgnitionVisualization::plotContactResults(const std::vector<std::string>& link_names,
@@ -225,7 +224,7 @@ void TesseractIgnitionVisualization::plotContactResults(const std::vector<std::s
       cc_rgba << 0.0, 0.0, 1.0, 1.0;
       addArrow(entity_manager_, *link_msg, cnt,
                link_name, dist.transform[0] * dist.nearest_points_local[0],
-               dist.cc_transform[0] * dist.nearest_points_local[0], cc_rgba, 0.01);
+               dist.cc_transform[0] * dist.nearest_points_local[0], cc_rgba, 0.2);
     }
 
     if (dist.cc_type[1] == tesseract_collision::ContinuousCollisionType::CCType_Between)
@@ -234,7 +233,7 @@ void TesseractIgnitionVisualization::plotContactResults(const std::vector<std::s
       cc_rgba << 0.0, 0.0, 0.5, 1.0;
       addArrow(entity_manager_, *link_msg, cnt,
                link_name, dist.transform[1] * dist.nearest_points_local[1],
-               dist.cc_transform[1] * dist.nearest_points_local[1], cc_rgba, 0.01);
+               dist.cc_transform[1] * dist.nearest_points_local[1], cc_rgba, 0.2);
     }
 
     auto it0 = std::find(link_names.begin(), link_names.end(), dist.link_names[0]);
@@ -242,16 +241,16 @@ void TesseractIgnitionVisualization::plotContactResults(const std::vector<std::s
 
     if (it0 != link_names.end() && it1 != link_names.end())
     {
-      addArrow(entity_manager_, *link_msg, cnt, link_name, dist.nearest_points[0], dist.nearest_points[1], rgba, 0.01);
-      addArrow(entity_manager_, *link_msg, cnt, link_name, dist.nearest_points[1], dist.nearest_points[0], rgba, 0.01);
+      addArrow(entity_manager_, *link_msg, cnt, link_name, dist.nearest_points[0], dist.nearest_points[1], rgba, 0.2);
+      addArrow(entity_manager_, *link_msg, cnt, link_name, dist.nearest_points[1], dist.nearest_points[0], rgba, 0.2);
     }
     else if (it0 != link_names.end())
     {
-      addArrow(entity_manager_, *link_msg, cnt, link_name, dist.nearest_points[1], dist.nearest_points[0], rgba, 0.01);
+      addArrow(entity_manager_, *link_msg, cnt, link_name, dist.nearest_points[1], dist.nearest_points[0], rgba, 0.2);
     }
     else
     {
-      addArrow(entity_manager_, *link_msg, cnt, link_name, dist.nearest_points[0], dist.nearest_points[1], rgba, 0.01);
+      addArrow(entity_manager_, *link_msg, cnt, link_name, dist.nearest_points[0], dist.nearest_points[1], rgba, 0.2);
     }
   }
   scene_pub_.Publish(scene_msg);
@@ -274,34 +273,33 @@ void TesseractIgnitionVisualization::plotArrow(const Eigen::Ref<const Eigen::Vec
   ignition::msgs::Link* link_msg = model->add_link();
   link_msg->set_id(static_cast<unsigned>(entity_manager_.addVisual(link_name)));
   link_msg->set_name(link_name);
-  addArrow(entity_manager_, *link_msg, cnt, link_name, pt1, pt2, rgba, scale);
+  addArrow(entity_manager_, *link_msg, cnt, link_name, pt1, pt2, rgba, scale * ((pt2 - pt1).norm() * (1.0 / 20)));
   scene_pub_.Publish(scene_msg);
 }
 
 void TesseractIgnitionVisualization::plotAxis(const Eigen::Isometry3d& axis, double scale)
 {
-//    visualization_msgs::MarkerArray msg;
-    Eigen::Vector3d x_axis = axis.matrix().block<3, 1>(0, 0);
-    Eigen::Vector3d y_axis = axis.matrix().block<3, 1>(0, 1);
-    Eigen::Vector3d z_axis = axis.matrix().block<3, 1>(0, 2);
-    Eigen::Vector3d position = axis.matrix().block<3, 1>(0, 3);
+  Eigen::Vector3d x_axis = axis.matrix().block<3, 1>(0, 0);
+  Eigen::Vector3d y_axis = axis.matrix().block<3, 1>(0, 1);
+  Eigen::Vector3d z_axis = axis.matrix().block<3, 1>(0, 2);
+  Eigen::Vector3d position = axis.matrix().block<3, 1>(0, 3);
 
-    ignition::msgs::Scene scene_msg;
-    scene_msg.set_name("scene");
-    ignition::msgs::Model* model = scene_msg.add_model();
-    std::string model_name = AXES_MODEL_NAME;
-    model->set_name(model_name);
-    model->set_id(static_cast<unsigned>(entity_manager_.addModel(model_name)));
+  ignition::msgs::Scene scene_msg;
+  scene_msg.set_name("scene");
+  ignition::msgs::Model* model = scene_msg.add_model();
+  std::string model_name = AXES_MODEL_NAME;
+  model->set_name(model_name);
+  model->set_id(static_cast<unsigned>(entity_manager_.addModel(model_name)));
 
-    long cnt = 0;
-    std::string link_name = model_name + std::to_string(++cnt);
-    ignition::msgs::Link* link_msg = model->add_link();
-    link_msg->set_id(static_cast<unsigned>(entity_manager_.addVisual(link_name)));
-    link_msg->set_name(link_name);
-    addCylinder(entity_manager_, *link_msg, cnt, link_name, position, position + (scale * x_axis), Eigen::Vector4d(1, 0, 0, 1), scale);
-    addCylinder(entity_manager_, *link_msg, cnt, link_name, position, position + (scale * y_axis), Eigen::Vector4d(0, 1, 0, 1), scale);
-    addCylinder(entity_manager_, *link_msg, cnt, link_name, position, position + (scale * z_axis), Eigen::Vector4d(0, 0, 1, 1), scale);
-    scene_pub_.Publish(scene_msg);
+  long cnt = 0;
+  std::string link_name = model_name + std::to_string(++cnt);
+  ignition::msgs::Link* link_msg = model->add_link();
+  link_msg->set_id(static_cast<unsigned>(entity_manager_.addVisual(link_name)));
+  link_msg->set_name(link_name);
+  addCylinder(entity_manager_, *link_msg, cnt, link_name, position, position + (scale * x_axis), Eigen::Vector4d(1, 0, 0, 1), scale * (1.0 / 20));
+  addCylinder(entity_manager_, *link_msg, cnt, link_name, position, position + (scale * y_axis), Eigen::Vector4d(0, 1, 0, 1), scale * (1.0 / 20));
+  addCylinder(entity_manager_, *link_msg, cnt, link_name, position, position + (scale * z_axis), Eigen::Vector4d(0, 0, 1, 1), scale * (1.0 / 20));
+  scene_pub_.Publish(scene_msg);
 }
 
 void TesseractIgnitionVisualization::clear()

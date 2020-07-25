@@ -62,8 +62,19 @@ int main(int /*_argc*/, char** /*_argv*/)
     traj(i, 1) = 0.5;
   }
 
+  // Plot Trajectory
   plotting->waitForInput();
   plotting->plotTrajectory(joint_names, traj);
+
+  // Plot Axis
+  plotting->waitForInput();
+  Eigen::Isometry3d axis {Eigen::Isometry3d::Identity()};
+  axis.translation() = Eigen::Vector3d(1, 0, 0);
+  plotting->plotAxis(axis, 0.2);
+
+  // Plot Arrow
+  plotting->waitForInput();
+  plotting->plotArrow(Eigen::Vector3d(-1, 0, 0), Eigen::Vector3d(-1, 0, 1), Eigen::Vector4d(1, 0, 0, 1), 1);
 
   ignition::transport::waitForShutdown();
   return 0;
