@@ -42,3 +42,7 @@
     local-name: ignition_sensors
     uri: https://github.com/Levi-Armstrong/ign-sensors.git
     version: feature/PackageXML
+- git:
+    local-name: ignition_common
+    uri: https://github.com/Levi-Armstrong/ign-common.git
+    version: feature/PackageXML
