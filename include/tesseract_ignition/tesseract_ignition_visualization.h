@@ -102,8 +102,6 @@ private:
   ignition::transport::Node::Publisher pose_pub_;        /**< Pose publisher */
   ignition::transport::Node::Publisher deletion_pub_;    /**< Deletion publisher */
   EntityManager entity_manager_;
-
-  bool OnSceneRequest(ignition::msgs::Scene& msg);
 };
 
 }  // namespace tesseract_ignition

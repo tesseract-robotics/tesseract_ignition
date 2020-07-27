@@ -157,11 +157,6 @@ namespace plugins
     /// \brief Flag to indicate texture size has changed.
     public: bool textureDirty = false;
 
-    /// \brief Scene service. If not empty, a request will be made to get the
-    /// scene information using this service and the renderer will populate the
-    /// scene based on the response data
-    public: std::string sceneService;
-
     /// \brief Scene pose topic. If not empty, a node will subcribe to this
     /// topic to get pose updates of objects in the scene
     public: std::string poseTopic;
@@ -244,12 +239,6 @@ namespace plugins
     /// \brief Set the initial pose the render window camera
     /// \param[in] _pose Initical camera pose
     public: void SetCameraPose(const ignition::math::Pose3d &_pose);
-
-    /// \brief Set scene service to use in this render window
-    /// A service call will be made using ign-transport to get scene
-    /// data using this service
-    /// \param[in] _service Scene service name
-    public: void SetSceneService(const std::string &_service);
 
     /// \brief Set pose topic to use for updating objects in the scene
     /// The renderer will subscribe to this topic to get pose messages of

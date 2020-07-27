@@ -57,31 +57,24 @@ namespace plugins
     public: SceneManager();
 
     /// \brief Constructor
-    /// \param[in] _service Ign transport scene service name
     /// \param[in] _poseTopic Ign transport pose topic name
     /// \param[in] _deletionTopic Ign transport deletion topic name
     /// \param[in] _sceneTopic Ign transport scene topic name
     /// \param[in] _scene Pointer to the rendering scene
-    public: SceneManager(const std::string &_service,
-                         const std::string &_poseTopic,
+    public: SceneManager(const std::string &_poseTopic,
                          const std::string &_deletionTopic,
                          const std::string &_sceneTopic,
                          ignition::rendering::ScenePtr _scene);
 
     /// \brief Load the scene manager
-    /// \param[in] _service Ign transport service name
     /// \param[in] _poseTopic Ign transport pose topic name
     /// \param[in] _deletionTopic Ign transport deletion topic name
     /// \param[in] _sceneTopic Ign transport scene topic name
     /// \param[in] _scene Pointer to the rendering scene
-    public: void Load(const std::string &_service,
-                      const std::string &_poseTopic,
+    public: void Load(const std::string &_poseTopic,
                       const std::string &_deletionTopic,
                       const std::string &_sceneTopic,
                       ignition::rendering::ScenePtr _scene);
-
-    /// \brief Make the scene service request and populate the scene
-    public: void Request();
 
     /// \brief Update the scene based on pose msgs received
     public: void Update();
@@ -97,10 +90,6 @@ namespace plugins
     /// \brief Callback function for the request topic
     /// \param[in] _msg Deletion message
     private: void OnDeletionMsg(const ignition::msgs::UInt32_V &_msg);
-
-    /// \brief Load the scene from a scene msg
-    /// \param[in] _msg Scene msg
-    private: void OnSceneSrvMsg(const ignition::msgs::Scene &_msg, const bool result);
 
     /// \brief Called when there's an entity is added to the scene
     /// \param[in] _msg Scene msg
@@ -143,9 +132,6 @@ namespace plugins
     /// \brief Delete an entity
     /// \param[in] _entity Entity to delete
     private: void DeleteEntity(const unsigned int _entity);
-
-    //// \brief Ign-transport scene service name
-    private: std::string service;
 
     //// \brief Ign-transport pose topic name
     private: std::string poseTopic;
@@ -275,49 +261,70 @@ SceneManager::SceneManager()
 }
 
 /////////////////////////////////////////////////
-SceneManager::SceneManager(const std::string &_service,
-                           const std::string &_poseTopic,
+SceneManager::SceneManager(const std::string &_poseTopic,
                            const std::string &_deletionTopic,
                            const std::string &_sceneTopic,
                            ignition::rendering::ScenePtr _scene)
 {
-  this->Load(_service, _poseTopic, _deletionTopic, _sceneTopic, _scene);
+  this->Load(_poseTopic, _deletionTopic, _sceneTopic, _scene);
 }
 
 /////////////////////////////////////////////////
-void SceneManager::Load(const std::string &_service,
-                        const std::string &_poseTopic,
+void SceneManager::Load(const std::string &_poseTopic,
                         const std::string &_deletionTopic,
                         const std::string &_sceneTopic,
                         ignition::rendering::ScenePtr _scene)
 {
-  this->service = _service;
   this->poseTopic = _poseTopic;
   this->deletionTopic = _deletionTopic;
   this->sceneTopic = _sceneTopic;
   this->scene = _scene;
-}
 
-/////////////////////////////////////////////////
-void SceneManager::Request()
-{
-  // wait for the service to be advertized
-  std::vector<ignition::transport::ServicePublisher> publishers;
-  const std::chrono::duration<double> sleepDuration{1.0};
-  const std::size_t tries = 30;
-  for (std::size_t i = 0; i < tries; ++i)
+  if (!this->poseTopic.empty())
   {
-    this->node.ServiceInfo(this->service, publishers);
-    if (publishers.size() > 0)
-      break;
-    std::this_thread::sleep_for(sleepDuration);
-    igndbg << "Waiting for service " << this->service << "\n";
+    if (!this->node.Subscribe(this->poseTopic, &SceneManager::OnPoseVMsg, this))
+    {
+      ignerr << "Error subscribing to pose topic: " << this->poseTopic
+        << std::endl;
+    }
+  }
+  else
+  {
+    ignwarn << "The pose topic, set via <pose_topic>, for the Scene3D plugin "
+      << "is missing or empty. Please set this topic so that the Scene3D "
+      << "can receive and process pose information.\n";
   }
 
-  if (publishers.empty() ||
-      !this->node.Request(this->service, &SceneManager::OnSceneSrvMsg, this))
+  if (!this->deletionTopic.empty())
   {
-    ignerr << "Error making service request to " << this->service << std::endl;
+    if (!this->node.Subscribe(this->deletionTopic, &SceneManager::OnDeletionMsg,
+          this))
+    {
+      ignerr << "Error subscribing to deletion topic: " << this->deletionTopic
+        << std::endl;
+    }
+  }
+  else
+  {
+    ignwarn << "The deletion topic, set via <deletion_topic>, for the "
+      << "Scene3D plugin is missing or empty. Please set this topic so that "
+      << "the Scene3D can receive and process deletion information.\n";
+  }
+
+  if (!this->sceneTopic.empty())
+  {
+    if (!this->node.Subscribe(
+          this->sceneTopic, &SceneManager::OnSceneMsg, this))
+    {
+      ignerr << "Error subscribing to scene topic: " << this->sceneTopic
+             << std::endl;
+    }
+  }
+  else
+  {
+    ignwarn << "The scene topic, set via <scene_topic>, for the "
+      << "Scene3D plugin is missing or empty. Please set this topic so that "
+      << "the Scene3D can receive and process scene information.\n";
   }
 }
 
@@ -417,69 +424,6 @@ void SceneManager::OnSceneMsg(const ignition::msgs::Scene &_msg)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
   this->sceneMsgs.push_back(_msg);
-}
-
-/////////////////////////////////////////////////
-void SceneManager::OnSceneSrvMsg(const ignition::msgs::Scene &_msg, const bool result)
-{
-  if (!result)
-  {
-    ignerr << "Error making service request to " << this->service
-           << std::endl;
-    return;
-  }
-
-  {
-    std::lock_guard<std::mutex> lock(this->mutex);
-    this->sceneMsgs.push_back(_msg);
-  }
-
-  if (!this->poseTopic.empty())
-  {
-    if (!this->node.Subscribe(this->poseTopic, &SceneManager::OnPoseVMsg, this))
-    {
-      ignerr << "Error subscribing to pose topic: " << this->poseTopic
-        << std::endl;
-    }
-  }
-  else
-  {
-    ignwarn << "The pose topic, set via <pose_topic>, for the Scene3D plugin "
-      << "is missing or empty. Please set this topic so that the Scene3D "
-      << "can receive and process pose information.\n";
-  }
-
-  if (!this->deletionTopic.empty())
-  {
-    if (!this->node.Subscribe(this->deletionTopic, &SceneManager::OnDeletionMsg,
-          this))
-    {
-      ignerr << "Error subscribing to deletion topic: " << this->deletionTopic
-        << std::endl;
-    }
-  }
-  else
-  {
-    ignwarn << "The deletion topic, set via <deletion_topic>, for the "
-      << "Scene3D plugin is missing or empty. Please set this topic so that "
-      << "the Scene3D can receive and process deletion information.\n";
-  }
-
-  if (!this->sceneTopic.empty())
-  {
-    if (!this->node.Subscribe(
-          this->sceneTopic, &SceneManager::OnSceneMsg, this))
-    {
-      ignerr << "Error subscribing to scene topic: " << this->sceneTopic
-             << std::endl;
-    }
-  }
-  else
-  {
-    ignwarn << "The scene topic, set via <scene_topic>, for the "
-      << "Scene3D plugin is missing or empty. Please set this topic so that "
-      << "the Scene3D can receive and process scene information.\n";
-  }
 }
 
 void SceneManager::LoadScene(const ignition::msgs::Scene &_msg)
@@ -1030,13 +974,12 @@ void IgnRenderer::Initialize()
   this->dataPtr->camera->PreRender();
   this->textureId = this->dataPtr->camera->RenderTextureGLId();
 
-  // Make service call to populate scene
-  if (!this->sceneService.empty())
+  // If scen topic then subscribe
+  if (!this->sceneTopic.empty())
   {
-    this->dataPtr->sceneManager.Load(this->sceneService, this->poseTopic,
+    this->dataPtr->sceneManager.Load(this->poseTopic,
                                      this->deletionTopic, this->sceneTopic,
                                      scene);
-    this->dataPtr->sceneManager.Request();
   }
 
   // Ray Query
@@ -1355,12 +1298,6 @@ void RenderWindowItem::SetCameraPose(const ignition::math::Pose3d &_pose)
 }
 
 /////////////////////////////////////////////////
-void RenderWindowItem::SetSceneService(const std::string &_service)
-{
-  this->dataPtr->renderThread->ignRenderer.sceneService = _service;
-}
-
-/////////////////////////////////////////////////
 void RenderWindowItem::SetPoseTopic(const std::string &_topic)
 {
   this->dataPtr->renderThread->ignRenderer.poseTopic = _topic;
@@ -1457,12 +1394,6 @@ void TesseractScene3D::LoadConfig(const tinyxml2::XMLElement *_pluginElem)
       poseStr << std::string(elem->GetText());
       poseStr >> pose;
       renderWindow->SetCameraPose(pose);
-    }
-
-    if (auto elem = _pluginElem->FirstChildElement("scene_service"))
-    {
-      std::string service = elem->GetText();
-      renderWindow->SetSceneService(service);
     }
 
     if (auto elem = _pluginElem->FirstChildElement("pose_topic"))

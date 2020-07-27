@@ -32,7 +32,6 @@
 #include <ignition/math/eigen3/Conversions.hh>
 #include <chrono>
 
-static const std::string DEFAULT_SCENE_SERVICE_NAME =  "/tesseract_ignition/service/scene"; // ignition::msgs::Scene
 static const std::string DEFAULT_SCENE_TOPIC_NAME =    "/tesseract_ignition/topic/scene"; // ignition::msgs::Scene
 static const std::string DEFAULT_POSE_TOPIC_NAME =     "/tesseract_ignition/topic/pose"; // ignition::msgs::Pose_V
 static const std::string DEFAULT_DELETION_TOPIC_NAME = "/tesseract_ignition/topic/deletion"; // ignition::msgs::UInt32_V
@@ -45,22 +44,24 @@ using namespace tesseract_ignition;
 TesseractIgnitionVisualization::TesseractIgnitionVisualization(tesseract_environment::Environment::ConstPtr env)
   : env_(std::move(env))
 {
-  // Advertise a service call.
-  if (!node_.Advertise(DEFAULT_SCENE_SERVICE_NAME, &TesseractIgnitionVisualization::OnSceneRequest, this))
-  {
-    ignerr << "Error advertising service [" << DEFAULT_SCENE_SERVICE_NAME << "]" << std::endl;
-  }
   scene_pub_ = node_.Advertise<ignition::msgs::Scene>(DEFAULT_SCENE_TOPIC_NAME);
   pose_pub_  = node_.Advertise<ignition::msgs::Pose_V>(DEFAULT_POSE_TOPIC_NAME);
   deletion_pub_  = node_.Advertise<ignition::msgs::Pose_V>(DEFAULT_DELETION_TOPIC_NAME);
-}
 
-bool TesseractIgnitionVisualization::OnSceneRequest(ignition::msgs::Scene &msg)
-{
-  bool success = true;
-  toMsg(msg, entity_manager_, *(env_->getSceneGraph()), env_->getCurrentState()->link_transforms);
-  ignerr << "TesseractIgnitionVisualization::OnSceneRequest" << std::endl;
-  return success;
+  // Wait 10 seconds for a connection to scene topic
+  for (int i = 0; i < 10; ++i)
+    if (!scene_pub_.HasConnections())
+      sleep(1);
+    else
+      break;
+
+  if (scene_pub_.HasConnections())
+  {
+    ignition::msgs::Scene msg;
+    toMsg(msg, entity_manager_, *(env_->getSceneGraph()), env_->getCurrentState()->link_transforms);
+
+    scene_pub_.Publish(msg);
+  }
 }
 
 void TesseractIgnitionVisualization::plotTrajectory(const std::vector<std::string>& joint_names,
@@ -322,7 +323,7 @@ void TesseractIgnitionVisualization::clear()
 
 void TesseractIgnitionVisualization::waitForInput()
 {
-  ignwarn  << "Hit enter key to step optimization!" << std::endl;
+  std::cout << "Hit enter key to continue!" << std::endl;
   std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 

@@ -19,8 +19,8 @@ int main(int _argc, char **_argv)
   app.setOrganizationDomain("SwRI");
 
   const char *env = std::getenv("TSW_CONFIG_PATH");
-    std::string tsw_config_path = (env) ? std::string(env) :
-        TSW_CONFIG_PATH;
+  std::string tsw_config_path = (env) ? std::string(env) :
+      TSW_CONFIG_PATH;
 
   if (!app.LoadConfig(tsw_config_path))
     return 1;
