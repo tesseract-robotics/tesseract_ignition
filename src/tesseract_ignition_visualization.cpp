@@ -41,9 +41,12 @@ static const std::string ARROW_MODEL_NAME = "tesseract_arrow_model";
 
 using namespace tesseract_ignition;
 
-TesseractIgnitionVisualization::TesseractIgnitionVisualization(tesseract_environment::Environment::ConstPtr env)
-  : env_(std::move(env))
+bool TesseractIgnitionVisualization::init(tesseract::Tesseract::ConstPtr thor)
 {
+  if (thor == nullptr)
+    return false;
+
+  thor_ = std::move(thor);
   scene_pub_ = node_.Advertise<ignition::msgs::Scene>(DEFAULT_SCENE_TOPIC_NAME);
   pose_pub_  = node_.Advertise<ignition::msgs::Pose_V>(DEFAULT_POSE_TOPIC_NAME);
   deletion_pub_  = node_.Advertise<ignition::msgs::Pose_V>(DEFAULT_DELETION_TOPIC_NAME);
@@ -58,16 +61,22 @@ TesseractIgnitionVisualization::TesseractIgnitionVisualization(tesseract_environ
   if (scene_pub_.HasConnections())
   {
     ignition::msgs::Scene msg;
-    toMsg(msg, entity_manager_, *(env_->getSceneGraph()), env_->getCurrentState()->link_transforms);
+    toMsg(msg, entity_manager_, *(thor_->getEnvironmentConst()->getSceneGraph()), thor_->getEnvironmentConst()->getCurrentState()->link_transforms);
 
     scene_pub_.Publish(msg);
   }
+  else
+  {
+    return false;
+  }
+
+  return true;
 }
 
 void TesseractIgnitionVisualization::plotTrajectory(const std::vector<std::string>& joint_names,
                                                     const Eigen::Ref<const tesseract_common::TrajArray>& traj)
 {
-  tesseract_environment::StateSolver::Ptr state_solver = env_->getStateSolver();
+  tesseract_environment::StateSolver::Ptr state_solver = thor_->getEnvironmentConst()->getStateSolver();
 
   std::chrono::duration<double> fp_s(1.0/static_cast<double>(traj.rows()));
   for (long i = 0; i < traj.rows(); ++i)

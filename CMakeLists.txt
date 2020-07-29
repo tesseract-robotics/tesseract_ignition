@@ -9,6 +9,7 @@ find_package(tesseract_support REQUIRED)
 find_package(tesseract_urdf REQUIRED)
 find_package(tesseract_visualization REQUIRED)
 find_package(tesseract REQUIRED)
+find_package(class_loader REQUIRED)
 
 # Find ignition-gui
 find_package(ignition-gui4 REQUIRED)
@@ -147,8 +148,8 @@ target_include_directories(TesseractVideoRecorder SYSTEM PUBLIC
     ${IGNITION-TRANSPORT_INCLUDE_DIRS}
     ${IGNITION-MSGS_INCLUDE_DIRS})
 
-add_library(TesseractIgnitionVisualization SHARED src/tesseract_ignition_visualization.cpp)
-target_link_libraries(TesseractIgnitionVisualization PUBLIC
+add_library(tesseract_ignition_visualization SHARED src/tesseract_ignition_visualization.cpp)
+target_link_libraries(tesseract_ignition_visualization PUBLIC
   ${PROJECT_NAME}
   tesseract::tesseract_environment_core
   tesseract::tesseract_visualization
@@ -156,14 +157,20 @@ target_link_libraries(TesseractIgnitionVisualization PUBLIC
   ${IGNITION-COMMON_LIBRARIES}
   ${IGNITION-TRANSPORT_LIBRARIES}
   ${IGNITION-MSGS_LIBRARIES})
-tesseract_target_compile_options(TesseractIgnitionVisualization PUBLIC)
-target_include_directories(TesseractIgnitionVisualization PUBLIC
+tesseract_target_compile_options(tesseract_ignition_visualization PUBLIC)
+target_include_directories(tesseract_ignition_visualization PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include>")
-target_include_directories(TesseractIgnitionVisualization SYSTEM PUBLIC
+target_include_directories(tesseract_ignition_visualization SYSTEM PUBLIC
     ${IGNITION-COMMON_INCLUDE_DIRS}
     ${IGNITION-TRANSPORT_INCLUDE_DIRS}
     ${IGNITION-MSGS_INCLUDE_DIRS})
+
+add_library(tesseract_ignition_visualization_plugin SHARED src/tesseract_ignition_visualization_plugin.cpp)
+target_link_libraries(tesseract_ignition_visualization_plugin PUBLIC tesseract_ignition_visualization ${class_loader_LIBRARIES})
+tesseract_target_compile_options(tesseract_ignition_visualization_plugin PRIVATE)
+target_include_directories(tesseract_ignition_visualization_plugin SYSTEM PRIVATE
+    ${class_loader_INCLUDE_DIRS})
 
 add_executable(tesseract_setup_wizard_app src/tesseract_setup_wizard_app.cpp)
 target_link_libraries(tesseract_setup_wizard_app PUBLIC
@@ -209,7 +216,7 @@ target_include_directories(demo_dialog PUBLIC
 
 add_executable(demo_tesseract src/demo_tesseract.cpp)
 target_link_libraries(demo_tesseract PUBLIC
-  TesseractIgnitionVisualization
+  tesseract_ignition_visualization
   tesseract::tesseract_environment_kdl
   tesseract::tesseract_support
   tesseract::tesseract_scene_graph
@@ -223,8 +230,9 @@ tesseract_configure_package(
   TesseractScene3D
   TesseractGridConfig
   TesseractVideoRecorder
-  TesseractIgnitionVisualization
   TesseractSetupWizard
+  tesseract_ignition_visualization
+  tesseract_ignition_visualization_plugin
   tesseract_setup_wizard_app
   tesseract_visualization_app
   demo_dialog

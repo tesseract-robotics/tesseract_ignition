@@ -31,24 +31,16 @@ std::string locateResource(const std::string& url)
   return mod_url;
 }
 
-tesseract_scene_graph::SceneGraph::Ptr getSceneGraph()
-{
-  std::string path = std::string(TESSERACT_SUPPORT_DIR) + "/urdf/lbr_iiwa_14_r820.urdf";
-
-  tesseract_scene_graph::ResourceLocator::Ptr locator =
-      std::make_shared<tesseract_scene_graph::SimpleResourceLocator>(locateResource);
-  return tesseract_urdf::parseURDFFile(path, locator);
-}
-
 int main(int /*_argc*/, char** /*_argv*/)
 {
-  auto env = std::make_shared<tesseract_environment::KDLEnv>();
-
-  tesseract_ignition::TesseractIgnitionVisualization::Ptr plotting;
-  if (env->init(getSceneGraph()))
-  {
-    plotting = std::make_shared<tesseract_ignition::TesseractIgnitionVisualization>(env);
-  }
+  tesseract_scene_graph::ResourceLocator::Ptr locator =
+      std::make_shared<tesseract_scene_graph::SimpleResourceLocator>(locateResource);
+  auto tesseract = std::make_shared<tesseract::Tesseract>();
+  boost::filesystem::path urdf_path(std::string(TESSERACT_SUPPORT_DIR) + "/urdf/lbr_iiwa_14_r820.urdf");
+  boost::filesystem::path srdf_path(std::string(TESSERACT_SUPPORT_DIR) + "/urdf/lbr_iiwa_14_r820.srdf");
+  auto plotting = std::make_shared<tesseract_ignition::TesseractIgnitionVisualization>();
+  if (tesseract->init(urdf_path, srdf_path, locator))
+    plotting->init(tesseract);
 
   long num_steps = 100;
   std::vector<std::string> joint_names = {"joint_a1", "joint_a2", "joint_a3", "joint_a4", "joint_a5", "joint_a6", "joint_a7"};
