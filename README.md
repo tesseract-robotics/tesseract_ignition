@@ -45,7 +45,7 @@ export IGN_GUI_PLUGIN_PATH=/home/larmstrong/catkin_ws/trajopt_only_ws/devel/lib/
   * 'cd snapcraft'
   * 'SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=16G snapcraft --bind-ssh --enable-experimental-package-repositories`
   * Notes:
-    * The `--build-ssh` allows access to your local ssh keys for pulling resources from our internal gitlab server.
+    * The `--bind-ssh` allows access to your local ssh keys for pulling resources from our internal gitlab server.
     * The `--enable-experimental-package-repositories` because we are using version 4.0 which has not been released.
 * Test Snap
   * `sudo snap install --dangerous --classic tesseract-ignition_X.X_amd64.snap`
@@ -54,7 +54,7 @@ export IGN_GUI_PLUGIN_PATH=/home/larmstrong/catkin_ws/trajopt_only_ws/devel/lib/
 * Use with ROS workspace
   * source workspace
   * tesseract-ignition.tesseract-setup-wizard
-  * Note: If you want to include another package not in your path you can leverages the environment variable TSW_RESOURCE_PATH to do this shown below.
+  * Note: If you want to include another package not in your path you can leverage the environment variable TSW_RESOURCE_PATH to do this shown below.
     * TSW_RESOURCE_PATH=/home/user/workspace/src/package tesseract-ignition.tesseract-setup-wizard
 * Upload to Snap Store
   * snapcraft login
