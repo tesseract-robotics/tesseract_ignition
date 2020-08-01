@@ -153,6 +153,7 @@ parts:
       - qml-module-qtquick-dialogs
       - qml-module-qtquick-extras
       - qml-module-qtquick-layouts
+      - libpsm-infinipath1
 
 #  stage:
 #    # stage everything EXCEPT (note the minuses that make this a blacklist)
