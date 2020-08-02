@@ -23,11 +23,11 @@
 * If using data models write your qml code to access the model through the object. This way if the model is assigned a
   different model your UI will continue to work.
 
-## Setup
+## Buiding from source
 For ignition to find the plugins built by this package you must set the following environment variable.
 
 ``` bash
-export IGN_GUI_PLUGIN_PATH=/home/larmstrong/catkin_ws/trajopt_only_ws/devel/lib/
+export IGN_GUI_PLUGIN_PATH=/home/<username>/<workspace>/devel/lib/
 ```
 
 ## Snap Download
