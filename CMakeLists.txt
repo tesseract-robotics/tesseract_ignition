@@ -9,6 +9,8 @@ find_package(tesseract_support REQUIRED)
 find_package(tesseract_urdf REQUIRED)
 find_package(tesseract_visualization REQUIRED)
 find_package(tesseract REQUIRED)
+find_package(tesseract_command_language REQUIRED)
+find_package(tesseract_motion_planners REQUIRED)
 find_package(class_loader REQUIRED)
 
 # Find ignition-gui
@@ -154,6 +156,8 @@ target_link_libraries(tesseract_ignition_visualization PUBLIC
   tesseract::tesseract_environment_core
   tesseract::tesseract_visualization
   tesseract::tesseract_common
+  tesseract::tesseract_command_language
+  tesseract::tesseract_motion_planners_core
   ${IGNITION-COMMON_LIBRARIES}
   ${IGNITION-TRANSPORT_LIBRARIES}
   ${IGNITION-MSGS_LIBRARIES})

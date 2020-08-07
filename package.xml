@@ -11,6 +11,8 @@
   <depend>tesseract_common</depend>
   <depend>tesseract_environment</depend>
   <depend>tesseract_visualization</depend>
+  <depend>tesseract_command_language</depend>
+  <depend>tesseract_motion_planners</depend>
   <depend>tesseract</depend>
   <depend>ignition_gui</depend>
   <depend>ignition_msgs</depend>

@@ -1,7 +1,7 @@
 - git:
     local-name: tesseract
-    uri: https://github.com/ros-industrial-consortium/tesseract.git
-    version: feature/CommandLanguage
+    uri: https:	https://github.com/Levi-Armstrong/tesseract_ignition.git
+    version: issue/FixFlattenUtils
 - git:
     local-name: tesseract_ext
     uri: https://github.com/ros-industrial-consortium/tesseract_ext.git

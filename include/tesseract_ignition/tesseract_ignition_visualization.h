@@ -50,6 +50,10 @@ public:
 
   void plotTrajectory(const tesseract_common::JointTrajectory& traj) override;
 
+  void plotTrajectory(const tesseract_planning::Instruction& instruction) override;
+
+  void plotToolPath(const tesseract_planning::Instruction& instruction) override;
+
   void plotContactResults(const std::vector<std::string>& link_names,
                           const tesseract_collision::ContactResultVector& dist_results,
                           const Eigen::Ref<const Eigen::VectorXd>& safety_distances) override;
@@ -72,6 +76,12 @@ private:
   ignition::transport::Node::Publisher pose_pub_;        /**< Pose publisher */
   ignition::transport::Node::Publisher deletion_pub_;    /**< Deletion publisher */
   EntityManager entity_manager_;
+
+  /**
+   * @brief Helper function for sending state to visualization tool
+   * @param env_state Environment state
+   */
+  void sendEnvState(const tesseract_environment::EnvState::Ptr& env_state);
 };
 
 }  // namespace tesseract_ignition
