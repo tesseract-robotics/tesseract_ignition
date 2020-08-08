@@ -6,7 +6,7 @@ description: |
   This current contains the Tesseract Setup Wizard.
 
 grade: stable # must be 'stable' to release into candidate/stable channels
-confinement: strict # use 'strict' once you have the right plugs and slots
+confinement: devmode # use 'strict' once you have the right plugs and slots
 
 # This is only available in snap verions 4.0 and greater
 package-repositories:
@@ -93,9 +93,12 @@ parts:
       - tesseract_motion_planners
       - opw_kinematics
       - descartes_light
+      - descartes_samplers
       - bullet3
       - fcl
       - libccd
+      - trajopt
+      - trajopt_sco
       - ignition_common
       - ignition_gui
       - ignition_msgs

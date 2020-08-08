@@ -1,6 +1,6 @@
 - git:
     local-name: tesseract
-    uri: https:	https://github.com/Levi-Armstrong/tesseract_ignition.git
+    uri: https://github.com/Levi-Armstrong/tesseract-1.git
     version: issue/FixFlattenUtils
 - git:
     local-name: tesseract_ext
