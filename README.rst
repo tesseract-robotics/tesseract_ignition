@@ -33,11 +33,11 @@ Install Snapcraft
 
 * Need version 4.0 which is not release so use this command to get it `sudo snap refresh --candidate snapcraft`
 * Setup Workspace (This is already setup but the procedure is below.)
-* Create directory snapcraft
-* Create directory snapcraft/snap
-* Create directory snapcraft/snap/local
-* Create rosinstall snapcraft/snap/local/ignition_snap.rosinstall that pull all resources for your snap
-* Create config snapcraft/snap/snapcraft.yaml
+* Create directory snap
+* Create directory snap/local
+* Create rosinstall snap/local/ignition_snap.rosinstall that pull all resources for your snap
+* Create config snap/snapcraft.yaml
+* Also once registared with snapcraft.io you can setup automatic builds
 
 Build Snap
 ----------
