@@ -99,6 +99,9 @@ parts:
       - libccd
       - trajopt
       - trajopt_sco
+      - trajopt_utils
+      - osqp
+      - osqp_eigen
       - ignition_common
       - ignition_gui
       - ignition_msgs
@@ -117,7 +120,6 @@ parts:
       - qtbase5-dev
       - qtdeclarative5-dev
       - qtquickcontrols2-5-dev
-      - qml-module-qtquick-controls
       - mesa-utils
       - libgl1-mesa-glx
     stage-packages:
@@ -148,6 +150,7 @@ parts:
       - libqt5quick5
       - libqt5widgets5
       - libqt5quickwidgets5
+      - libqt5quickcontrols2-5
       - qmlscene
       - qml-module-qtquick2
       - qml-module-qtquick-controls
@@ -159,6 +162,9 @@ parts:
       - qml-module-qtquick-extras
       - qml-module-qtquick-layouts
       - libpsm-infinipath1
+      - qtbase5-dev
+      - qtdeclarative5-dev
+      - qtquickcontrols2-5-dev
 
 #  stage:
 #    # stage everything EXCEPT (note the minuses that make this a blacklist)
