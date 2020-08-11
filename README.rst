@@ -43,19 +43,37 @@ Build Snap
 ----------
 
 * 'cd snapcraft'
-* 'SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=16G snapcraft --bind-ssh --enable-experimental-package-repositories`
+* 'SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=16G snapcraft --enable-experimental-package-repositories`
 
 .. note::
 
-   * The `--bind-ssh` allows access to your local ssh keys for pulling resources from our internal gitlab server.
    * The `--enable-experimental-package-repositories` because we are using version 4.0 which has not been released.
 
 Test Snap
 ---------
 
-* `sudo snap install --dangerous --classic tesseract-ignition_X.X_amd64.snap`
-* `sudo snap connect tesseract-ignition:hostfs-opt-ros`
-* `tesseract.tesseract-setup-wizard`
+* `snap install --dangerous --classic tesseract-ignition_X.X_amd64.snap`
+* `snap connect tesseract-ignition:hostfs-opt-ros`
+* Verify connection `snap connections tesseract-ignition`
+
+  .. code-block:: bash
+
+     Interface                             Plug                                      Slot                                                  Notes
+     content[icon-themes]                  tesseract-ignition:icon-themes            gtk-common-themes:icon-themes                         -
+     content[kde-frameworks-5-core18-all]  tesseract-ignition:kde-frameworks-5-plug  kde-frameworks-5-core18:kde-frameworks-5-core18-slot  -
+     content[sound-themes]                 tesseract-ignition:sound-themes           gtk-common-themes:sound-themes                        -
+     desktop                               tesseract-ignition:desktop                :desktop                                              -
+     desktop-legacy                        tesseract-ignition:desktop-legacy         :desktop-legacy                                       -
+     home                                  tesseract-ignition:home                   :home                                                 -
+     network                               tesseract-ignition:network                :network                                              -
+     opengl                                tesseract-ignition:opengl                 :opengl                                               -
+     removable-media                       tesseract-ignition:removable-media        -                                                     -
+     system-files                          tesseract-ignition:hostfs-opt-ros         :system-files                                         manual
+     wayland                               tesseract-ignition:wayland                :wayland                                              -
+     x11                                   tesseract-ignition:x11                    :x11                                                  -
+
+
+* `tesseract-ignition.tesseract-setup-wizard`
 
 Upload to Snap Store
 --------------------

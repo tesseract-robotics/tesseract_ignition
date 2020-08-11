@@ -5,8 +5,8 @@ summary: Tesseract Ignition
 description: |
   This current contains the Tesseract Setup Wizard.
 
-grade: stable # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+grade: devel # must be 'stable or devel' to release into candidate/stable channels
+confinement: strict # use 'strict' once you have the right plugs and slots
 
 # This is only available in snap verions 4.0 and greater
 package-repositories:
