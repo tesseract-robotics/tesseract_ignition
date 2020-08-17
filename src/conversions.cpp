@@ -108,7 +108,7 @@ bool toMsg(ignition::msgs::Scene& scene_msg,
         ignition::msgs::CylinderGeom shape_geometry_msg;
         shape_geometry_msg.set_radius(shape->getRadius());
         shape_geometry_msg.set_length(shape->getLength());
-        geometry_msg.mutable_sphere()->CopyFrom(shape_geometry_msg);
+        geometry_msg.mutable_cylinder()->CopyFrom(shape_geometry_msg);
         gv_msg->mutable_geometry()->CopyFrom(geometry_msg);
 //          gv_msg.mutable_material()
         gv_msg->set_parent_name(link->getName());
