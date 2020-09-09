@@ -10,8 +10,7 @@ find_package(tesseract_urdf REQUIRED)
 find_package(tesseract_visualization REQUIRED)
 find_package(tesseract REQUIRED)
 find_package(tesseract_command_language REQUIRED)
-find_package(tesseract_motion_planners REQUIRED)
-find_package(class_loader REQUIRED)
+find_package(cmake_common_scripts REQUIRED)
 
 # Find ignition-gui
 find_package(ignition-gui4 REQUIRED)
@@ -25,6 +24,9 @@ set(COVERAGE_EXCLUDE /usr/* /opt/* ${CMAKE_CURRENT_LIST_DIR}/test/* /*/gtest/*)
 
 add_code_coverage_all_targets(EXCLUDE ${COVERAGE_EXCLUDE})
 
+# Load variable for clang tidy args, compiler options and cxx version
+tesseract_variables()
+
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-GUI_CXX_FLAGS}")
 
 # Need to add to target when upgraded to newer cmake version
@@ -36,17 +38,19 @@ link_directories(
   ${IGNITION-MSGS_LIBRARY_DIRS}
 )
 
-add_library(${PROJECT_NAME} SHARED src/conversions.cpp src/entity_manager.cpp src/utils.cpp src/render_utils.cpp)
+add_library(${PROJECT_NAME} SHARED src/conversions.cpp src/utils.cpp src/render_utils.cpp)
 target_link_libraries(${PROJECT_NAME} PUBLIC
   tesseract::tesseract_environment_kdl
   tesseract::tesseract_support
   tesseract::tesseract_urdf
   tesseract::tesseract
+  tesseract::tesseract_visualization_ignition
   ${IGNITION-COMMON_LIBRARIES}
   ${IGNITION-RENDERING_LIBRARIES}
   ${IGNITION-MSGS_LIBRARIES}
   Qt5::Core)
-tesseract_target_compile_options(${PROJECT_NAME} PUBLIC)
+target_compile_options(${PROJECT_NAME} PRIVATE ${TESSERACT_COMPILE_OPTIONS})
+target_cxx_version(${PROJECT_NAME} PUBLIC VERSION 17)
 target_include_directories(${PROJECT_NAME} PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include>")
@@ -150,32 +154,6 @@ target_include_directories(TesseractVideoRecorder SYSTEM PUBLIC
     ${IGNITION-TRANSPORT_INCLUDE_DIRS}
     ${IGNITION-MSGS_INCLUDE_DIRS})
 
-add_library(tesseract_ignition_visualization SHARED src/tesseract_ignition_visualization.cpp)
-target_link_libraries(tesseract_ignition_visualization PUBLIC
-  ${PROJECT_NAME}
-  tesseract::tesseract_environment_core
-  tesseract::tesseract_visualization
-  tesseract::tesseract_common
-  tesseract::tesseract_command_language
-  tesseract::tesseract_motion_planners_core
-  ${IGNITION-COMMON_LIBRARIES}
-  ${IGNITION-TRANSPORT_LIBRARIES}
-  ${IGNITION-MSGS_LIBRARIES})
-tesseract_target_compile_options(tesseract_ignition_visualization PUBLIC)
-target_include_directories(tesseract_ignition_visualization PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-    "$<INSTALL_INTERFACE:include>")
-target_include_directories(tesseract_ignition_visualization SYSTEM PUBLIC
-    ${IGNITION-COMMON_INCLUDE_DIRS}
-    ${IGNITION-TRANSPORT_INCLUDE_DIRS}
-    ${IGNITION-MSGS_INCLUDE_DIRS})
-
-add_library(tesseract_ignition_visualization_plugin SHARED src/tesseract_ignition_visualization_plugin.cpp)
-target_link_libraries(tesseract_ignition_visualization_plugin PUBLIC tesseract_ignition_visualization ${class_loader_LIBRARIES})
-tesseract_target_compile_options(tesseract_ignition_visualization_plugin PRIVATE)
-target_include_directories(tesseract_ignition_visualization_plugin SYSTEM PRIVATE
-    ${class_loader_INCLUDE_DIRS})
-
 add_executable(tesseract_setup_wizard_app src/tesseract_setup_wizard_app.cpp)
 target_link_libraries(tesseract_setup_wizard_app PUBLIC
   ${PROJECT_NAME}
@@ -218,29 +196,15 @@ target_include_directories(demo_dialog PUBLIC
       ${IGNITION-COMMON_INCLUDE_DIRS}
       ${IGNITION-RENDERING_INCLUDE_DIRS})
 
-add_executable(demo_tesseract src/demo_tesseract.cpp)
-target_link_libraries(demo_tesseract PUBLIC
-  tesseract_ignition_visualization
-  tesseract::tesseract_environment_kdl
-  tesseract::tesseract_support
-  tesseract::tesseract_scene_graph
-  tesseract::tesseract_urdf)
-target_include_directories(demo_tesseract PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-    "$<INSTALL_INTERFACE:include>")
-
-tesseract_configure_package(
+configure_package(NAMESPACE tesseract TARGETS
   ${PROJECT_NAME}
   TesseractScene3D
   TesseractGridConfig
   TesseractVideoRecorder
   TesseractSetupWizard
-  tesseract_ignition_visualization
-  tesseract_ignition_visualization_plugin
   tesseract_setup_wizard_app
   tesseract_visualization_app
-  demo_dialog
-  demo_tesseract)
+  demo_dialog)
 
 # Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}

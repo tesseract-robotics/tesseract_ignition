@@ -61,7 +61,7 @@ void UserDefinedJointStatesModel::setTesseract(tesseract::Tesseract::Ptr thor)
   this->clear();
   thor_ = thor;
   QStandardItem *parent_item = this->invisibleRootItem();
-  for (const auto& group : thor_->getGroupStatesConst())
+  for (const auto& group : thor_->getManipulatorManager()->getGroupJointStates())
   {
     for (const auto& state : group.second)
     {
@@ -92,11 +92,11 @@ void UserDefinedJointStatesModel::add(const QString& group_name,
 {
   QString state_name_trimmed = state_name.trimmed();
 
-  auto& group_states = thor_->getGroupStates();
+  const auto& group_states = thor_->getManipulatorManager()->getGroupJointStates();
   auto group = group_states.find(group_name.toStdString());
   bool add = true;
 
-  tesseract_scene_graph::JointState state;
+  tesseract_scene_graph::GroupsJointState state;
   for (int i = 0; i < joint_names.size(); ++i)
     state[joint_names[i].toStdString()] = joint_values[i].toDouble();
 
@@ -106,13 +106,13 @@ void UserDefinedJointStatesModel::add(const QString& group_name,
     if (s != group->second.end())
       add = false;
 
-    group->second[state_name_trimmed.toStdString()] = state;
+    thor_->getManipulatorManager()->addGroupJointState(group_name.toStdString(), state_name_trimmed.toStdString(), state);
   }
   else
   {
-    tesseract_scene_graph::JointStates states;
+    tesseract_scene_graph::GroupsJointStates states;
     states[state_name.toStdString()] = state;
-    group_states[group_name.toStdString()] = states;
+    thor_->getManipulatorManager()->addGroupJointState(group_name.toStdString(), state_name_trimmed.toStdString(), state);
   }
 
   QStandardItem *parent_item = this->invisibleRootItem();
@@ -138,10 +138,7 @@ bool UserDefinedJointStatesModel::removeRows(int row, int count, const QModelInd
     QStandardItem *row_item = item(row);
     QString group_name = row_item->data(UserDefinedJointStatesRoles::GroupNameRole).toString();
     QString state_name = row_item->data(UserDefinedJointStatesRoles::StateNameRole).toString();
-    auto& group_states = thor_->getGroupStates();
-    group_states[group_name.toStdString()].erase(state_name.toStdString());
-    if (group_states[group_name.toStdString()].empty())
-      group_states.erase(group_name.toStdString());
+    thor_->getManipulatorManager()->removeGroupJointState(group_name.toStdString(), state_name.toStdString());
 
     return QStandardItemModel::removeRows(row, count, parent);
   }

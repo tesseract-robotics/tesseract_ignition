@@ -22,7 +22,7 @@
 #include <vector>
 
 #include <tesseract/tesseract.h>
-#include <tesseract_ignition/entity_manager.h>
+#include <tesseract_visualization/ignition/entity_manager.h>
 
 //#include <sdf/Sensor.hh>
 
@@ -159,7 +159,7 @@ namespace tesseract_ignition
 
     /// \brief Get the entities currently selected, in order of selection.
     /// \return Vector of currently selected entities
-    std::vector<EntityID> selectedEntities() const;
+    std::vector<tesseract_visualization::EntityID> selectedEntities() const;
 
     /// \brief Clears the set of selected entities and lowlights all of them.
     void deselectAllEntities();

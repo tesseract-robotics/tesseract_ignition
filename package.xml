@@ -12,13 +12,12 @@
   <depend>tesseract_environment</depend>
   <depend>tesseract_visualization</depend>
   <depend>tesseract_command_language</depend>
-  <depend>tesseract_motion_planners</depend>
   <depend>tesseract</depend>
   <depend>ignition_gui</depend>
   <depend>ignition_msgs</depend>
   <depend>ignition_rendering</depend>
   <depend>ignition_sensors</depend>
-  <depend>class_loader</depend>
+  <build_depend>cmake_common_scripts</build_depend>
 
 <!--  <depend>libignition-rendering3-dev</depend>
   <depend>libignition-math6-eigen3-dev</depend>

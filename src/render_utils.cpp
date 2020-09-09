@@ -51,7 +51,7 @@ namespace tesseract_ignition
       bool load_environment{false};
 
       /** @brief The Tesseract Entity Manager */
-      EntityManager entity_manager;
+      tesseract_visualization::EntityManager entity_manager;
 
       /** @brief The Tesseract Object */
       tesseract::Tesseract::Ptr thor;
@@ -111,7 +111,7 @@ namespace tesseract_ignition
       bool enable_sensors {false};
 
       /** @brief A set containing all the entities with attached rendering sensors */
-      std::unordered_set<EntityID> sensorEntities;
+      std::unordered_set<tesseract_visualization::EntityID> sensorEntities;
 
 //      /// \brief Callback function for creating sensors.
 //      /// The function args are: entity id, sensor sdf, and parent name.
@@ -123,7 +123,7 @@ namespace tesseract_ignition
 //      std::function<void(const EntityID &)> removeSensorCb;
 
       /** @brief Currently selected entities, organized by order of selection. */
-      std::vector<EntityID> selectedEntities;
+      std::vector<tesseract_visualization::EntityID> selectedEntities;
 
       /** @brief Map of original emissive colors for nodes currently highlighted. */
       std::map<std::string, ignition::math::Color> originalEmissive;
@@ -294,7 +294,7 @@ namespace tesseract_ignition
 
       // Load Ignition Scene
       const tesseract_environment::EnvState::ConstPtr& state = this->dataPtr->thor->getEnvironment()->getCurrentState();
-      toScene(*(this->dataPtr->scene), this->dataPtr->entity_manager, *(this->dataPtr->thor->getEnvironmentConst()->getSceneGraph()), state->link_transforms);
+      toScene(*(this->dataPtr->scene), this->dataPtr->entity_manager, *(this->dataPtr->thor->getEnvironment()->getSceneGraph()), state->link_transforms);
 
       showGrid();
       showWorldAxis();
@@ -302,7 +302,7 @@ namespace tesseract_ignition
     }
     else if (this->dataPtr->thor)
     {
-      int revision = this->dataPtr->thor->getEnvironmentConst()->getRevision();
+      int revision = this->dataPtr->thor->getEnvironment()->getRevision();
       assert(this->dataPtr->tesseract_revision == revision);
       if (!commands.empty())
       {
@@ -486,12 +486,12 @@ namespace tesseract_ignition
       return;
 
     auto vis = std::dynamic_pointer_cast<ignition::rendering::Visual>(node);
-    EntityID entityId = NULL_ENTITY_ID;
+    tesseract_visualization::EntityID entityId = tesseract_visualization::NULL_ENTITY_ID;
 
     if (vis)
       entityId = static_cast<int>(vis->Id());
 
-    if (entityId == NULL_ENTITY_ID)
+    if (entityId == tesseract_visualization::NULL_ENTITY_ID)
       return;
 
     this->dataPtr->selectedEntities.push_back(entityId);
@@ -511,7 +511,7 @@ namespace tesseract_ignition
   }
 
   /////////////////////////////////////////////////
-  std::vector<EntityID> RenderUtil::selectedEntities() const
+  std::vector<tesseract_visualization::EntityID> RenderUtil::selectedEntities() const
   {
     return this->dataPtr->selectedEntities;
   }

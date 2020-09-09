@@ -61,7 +61,7 @@ void KinematicGroupsModel::setTesseract(tesseract::Tesseract::Ptr thor)
 
   thor_ = thor;
   QStandardItem *parent_item = this->invisibleRootItem();
-  for (const auto& group : thor_->getSRDFModelConst()->getChainGroups())
+  for (const auto& group : thor_->getManipulatorManager()->getChainGroups())
   {
     if (!group.second.empty())
     {
@@ -74,7 +74,7 @@ void KinematicGroupsModel::setTesseract(tesseract::Tesseract::Ptr thor)
     }
   }
 
-  for (const auto& group : thor_->getSRDFModelConst()->getJointGroups())
+  for (const auto& group : thor_->getManipulatorManager()->getJointGroups())
   {
     if (!group.second.empty())
     {
@@ -89,7 +89,7 @@ void KinematicGroupsModel::setTesseract(tesseract::Tesseract::Ptr thor)
     }
   }
 
-  for (const auto& group : thor_->getSRDFModelConst()->getLinkGroups())
+  for (const auto& group : thor_->getManipulatorManager()->getLinkGroups())
   {
     if (!group.second.empty())
     {
@@ -112,33 +112,32 @@ void KinematicGroupsModel::add(const QString& group_name, const QString& type, c
 
   if (type == "Chain")
   {
-    std::vector<std::string> fwd_solver_names = this->thor_->getFwdKinematicsManager()->getAvailableFwdKinematicsSolvers(tesseract_kinematics::ForwardKinematicsFactoryType::CHAIN);
-    std::vector<std::string> inv_solver_names = this->thor_->getInvKinematicsManager()->getAvailableInvKinematicsSolvers(tesseract_kinematics::InverseKinematicsFactoryType::CHAIN);
+    std::vector<std::string> fwd_solver_names = this->thor_->getManipulatorManager()->getAvailableFwdKinematicsSolvers(tesseract_kinematics::ForwardKinematicsFactoryType::CHAIN);
+    std::vector<std::string> inv_solver_names = this->thor_->getManipulatorManager()->getAvailableInvKinematicsSolvers(tesseract_kinematics::InverseKinematicsFactoryType::CHAIN);
     if (!fwd_solver_names.empty() || !inv_solver_names.empty())
     {
-      this->thor_->getFwdKinematicsManager()->removeFwdKinematicSolver(group_name_trimmed.toStdString());
-      this->thor_->getInvKinematicsManager()->removeInvKinematicSolver(group_name_trimmed.toStdString());
+      this->thor_->getManipulatorManager()->removeFwdKinematicSolver(group_name_trimmed.toStdString());
+      this->thor_->getManipulatorManager()->removeInvKinematicSolver(group_name_trimmed.toStdString());
 
       bool fwd_good { false };
       bool inv_good { false };
 
       if (!fwd_solver_names.empty())
       {
-        auto fwd_factory = this->thor_->getFwdKinematicsManager()->getFwdKinematicFactory(fwd_solver_names[0]);
-        auto fwd_kin = fwd_factory->create(this->thor_->getEnvironmentConst()->getSceneGraph(), data[0].toStdString(), data[1].toStdString(), group_name_trimmed.toStdString());
-        fwd_good = fwd_kin != nullptr && this->thor_->getFwdKinematicsManager()->addFwdKinematicSolver(fwd_kin);
+        auto fwd_factory = this->thor_->getManipulatorManager()->getFwdKinematicFactory(fwd_solver_names[0]);
+        auto fwd_kin = fwd_factory->create(this->thor_->getEnvironment()->getSceneGraph(), data[0].toStdString(), data[1].toStdString(), group_name_trimmed.toStdString());
+        fwd_good = fwd_kin != nullptr && this->thor_->getManipulatorManager()->addFwdKinematicSolver(fwd_kin);
       }
       if (!inv_solver_names.empty())
       {
-        auto inv_factory = this->thor_->getInvKinematicsManager()->getInvKinematicFactory(inv_solver_names[0]);
-        auto inv_kin = inv_factory->create(this->thor_->getEnvironmentConst()->getSceneGraph(), data[0].toStdString(), data[1].toStdString(), group_name_trimmed.toStdString());
-        inv_good = inv_kin != nullptr && this->thor_->getInvKinematicsManager()->addInvKinematicSolver(inv_kin);
+        auto inv_factory = this->thor_->getManipulatorManager()->getInvKinematicFactory(inv_solver_names[0]);
+        auto inv_kin = inv_factory->create(this->thor_->getEnvironment()->getSceneGraph(), data[0].toStdString(), data[1].toStdString(), group_name_trimmed.toStdString());
+        inv_good = inv_kin != nullptr && this->thor_->getManipulatorManager()->addInvKinematicSolver(inv_kin);
       }
 
       if (fwd_good || inv_good)
       {
-        tesseract_scene_graph::ChainGroups& chain_groups = this->thor_->getSRDFModel()->getChainGroups();
-        chain_groups[group_name_trimmed.toStdString()] = {std::make_pair(data[0].toStdString(), data[1].toStdString())};
+        this->thor_->getManipulatorManager()->addChainGroup(group_name_trimmed.toStdString(), {std::make_pair(data[0].toStdString(), data[1].toStdString())});
 
         auto item = new QStandardItem();
         item->setData(group_name_trimmed, KinematicGroupsRoles::NameRole);
@@ -151,12 +150,12 @@ void KinematicGroupsModel::add(const QString& group_name, const QString& type, c
   }
   else if (type == "Joint List")
   {
-    std::vector<std::string> fwd_solver_names = this->thor_->getFwdKinematicsManager()->getAvailableFwdKinematicsSolvers(tesseract_kinematics::ForwardKinematicsFactoryType::TREE);
-    std::vector<std::string> inv_solver_names = this->thor_->getInvKinematicsManager()->getAvailableInvKinematicsSolvers(tesseract_kinematics::InverseKinematicsFactoryType::TREE);
+    std::vector<std::string> fwd_solver_names = this->thor_->getManipulatorManager()->getAvailableFwdKinematicsSolvers(tesseract_kinematics::ForwardKinematicsFactoryType::TREE);
+    std::vector<std::string> inv_solver_names = this->thor_->getManipulatorManager()->getAvailableInvKinematicsSolvers(tesseract_kinematics::InverseKinematicsFactoryType::TREE);
     if (!fwd_solver_names.empty() || !inv_solver_names.empty())
     {
-      this->thor_->getFwdKinematicsManager()->removeFwdKinematicSolver(group_name_trimmed.toStdString());
-      this->thor_->getInvKinematicsManager()->removeInvKinematicSolver(group_name_trimmed.toStdString());
+      this->thor_->getManipulatorManager()->removeFwdKinematicSolver(group_name_trimmed.toStdString());
+      this->thor_->getManipulatorManager()->removeInvKinematicSolver(group_name_trimmed.toStdString());
 
       bool fwd_good { false };
       bool inv_good { false };
@@ -167,21 +166,20 @@ void KinematicGroupsModel::add(const QString& group_name, const QString& type, c
 
       if (!fwd_solver_names.empty())
       {
-        auto fwd_factory = this->thor_->getFwdKinematicsManager()->getFwdKinematicFactory(fwd_solver_names[0]);
-        auto fwd_kin = fwd_factory->create(this->thor_->getEnvironmentConst()->getSceneGraph(), joints, group_name_trimmed.toStdString());
-        fwd_good = fwd_kin != nullptr && this->thor_->getFwdKinematicsManager()->addFwdKinematicSolver(fwd_kin);
+        auto fwd_factory = this->thor_->getManipulatorManager()->getFwdKinematicFactory(fwd_solver_names[0]);
+        auto fwd_kin = fwd_factory->create(this->thor_->getEnvironment()->getSceneGraph(), joints, group_name_trimmed.toStdString());
+        fwd_good = fwd_kin != nullptr && this->thor_->getManipulatorManager()->addFwdKinematicSolver(fwd_kin);
       }
       if (!inv_solver_names.empty())
       {
-        auto inv_factory = this->thor_->getInvKinematicsManager()->getInvKinematicFactory(inv_solver_names[0]);
-        auto inv_kin = inv_factory->create(this->thor_->getEnvironmentConst()->getSceneGraph(), joints, group_name_trimmed.toStdString());
-        inv_good = inv_kin != nullptr && this->thor_->getInvKinematicsManager()->addInvKinematicSolver(inv_kin);
+        auto inv_factory = this->thor_->getManipulatorManager()->getInvKinematicFactory(inv_solver_names[0]);
+        auto inv_kin = inv_factory->create(this->thor_->getEnvironment()->getSceneGraph(), joints, group_name_trimmed.toStdString());
+        inv_good = inv_kin != nullptr && this->thor_->getManipulatorManager()->addInvKinematicSolver(inv_kin);
       }
 
       if (fwd_good || inv_good)
       {
-        tesseract_scene_graph::JointGroups& joint_groups = this->thor_->getSRDFModel()->getJointGroups();
-        joint_groups[group_name_trimmed.toStdString()] = joints;
+        this->thor_->getManipulatorManager()->addJointGroup(group_name_trimmed.toStdString(), joints);
 
         auto item = new QStandardItem();
         item->setData(group_name_trimmed, KinematicGroupsRoles::NameRole);
@@ -196,13 +194,13 @@ void KinematicGroupsModel::add(const QString& group_name, const QString& type, c
   }
   else if (type == "Link List")
   {
-    std::vector<std::string> fwd_solver_names = this->thor_->getFwdKinematicsManager()->getAvailableFwdKinematicsSolvers(tesseract_kinematics::ForwardKinematicsFactoryType::TREE);
-    std::vector<std::string> inv_solver_names = this->thor_->getInvKinematicsManager()->getAvailableInvKinematicsSolvers(tesseract_kinematics::InverseKinematicsFactoryType::TREE);
+    std::vector<std::string> fwd_solver_names = this->thor_->getManipulatorManager()->getAvailableFwdKinematicsSolvers(tesseract_kinematics::ForwardKinematicsFactoryType::TREE);
+    std::vector<std::string> inv_solver_names = this->thor_->getManipulatorManager()->getAvailableInvKinematicsSolvers(tesseract_kinematics::InverseKinematicsFactoryType::TREE);
 
     if (!fwd_solver_names.empty() || !inv_solver_names.empty())
     {
-      this->thor_->getFwdKinematicsManager()->removeFwdKinematicSolver(group_name_trimmed.toStdString());
-      this->thor_->getInvKinematicsManager()->removeInvKinematicSolver(group_name_trimmed.toStdString());
+      this->thor_->getManipulatorManager()->removeFwdKinematicSolver(group_name_trimmed.toStdString());
+      this->thor_->getManipulatorManager()->removeInvKinematicSolver(group_name_trimmed.toStdString());
 
       bool fwd_good { false };
       bool inv_good { false };
@@ -214,21 +212,20 @@ void KinematicGroupsModel::add(const QString& group_name, const QString& type, c
       // TODO: Need to find links active parent joint
       if (!fwd_solver_names.empty())
       {
-        auto fwd_factory = this->thor_->getFwdKinematicsManager()->getFwdKinematicFactory(fwd_solver_names[0]);
+        auto fwd_factory = this->thor_->getManipulatorManager()->getFwdKinematicFactory(fwd_solver_names[0]);
         auto fwd_kin = nullptr; //fwd_factory->create(this->thor_->getEnvironmentConst()->getSceneGraph(), joints, group_name_trimmed.toStdString());
-        fwd_good = fwd_kin != nullptr && this->thor_->getFwdKinematicsManager()->addFwdKinematicSolver(fwd_kin);
+        fwd_good = fwd_kin != nullptr && this->thor_->getManipulatorManager()->addFwdKinematicSolver(fwd_kin);
       }
       if (!inv_solver_names.empty())
       {
-        auto inv_factory = this->thor_->getInvKinematicsManager()->getInvKinematicFactory(inv_solver_names[0]);
+        auto inv_factory = this->thor_->getManipulatorManager()->getInvKinematicFactory(inv_solver_names[0]);
         auto inv_kin = nullptr; //inv_factory->create(this->thor_->getEnvironmentConst()->getSceneGraph(), joints, group_name_trimmed.toStdString());
-        inv_good = inv_kin != nullptr && this->thor_->getInvKinematicsManager()->addInvKinematicSolver(inv_kin);
+        inv_good = inv_kin != nullptr && this->thor_->getManipulatorManager()->addInvKinematicSolver(inv_kin);
       }
 
       if (fwd_good || inv_good)
       {
-        tesseract_scene_graph::LinkGroups& link_groups = this->thor_->getSRDFModel()->getLinkGroups();
-        link_groups[group_name_trimmed.toStdString()] = links;
+        this->thor_->getManipulatorManager()->addLinkGroup(group_name_trimmed.toStdString(), links);
 
         auto item = new QStandardItem();
         item->setData(group_name_trimmed, KinematicGroupsRoles::NameRole);
@@ -247,7 +244,7 @@ void KinematicGroupsModel::add(const QString& group_name, const QString& type, c
   }
 
   // If the count does not match then it was a replace so rebuild model.
-  std::size_t num_groups = this->thor_->getSRDFModel()->getChainGroups().size() + this->thor_->getSRDFModel()->getJointGroups().size() + this->thor_->getSRDFModel()->getLinkGroups().size();
+  std::size_t num_groups = this->thor_->getManipulatorManager()->getChainGroups().size() + this->thor_->getManipulatorManager()->getJointGroups().size() + this->thor_->getManipulatorManager()->getLinkGroups().size();
   if (parent_item->rowCount() != static_cast<int>(num_groups))
     setTesseract(thor_);
 }
@@ -261,24 +258,21 @@ bool KinematicGroupsModel::removeRows(int row, int count, const QModelIndex &par
     QString type = row_item->data(KinematicGroupsRoles::TypeRole).toString();
     if (type == "Chain")
     {
-      tesseract_scene_graph::ChainGroups& groups = this->thor_->getSRDFModel()->getChainGroups();
-      thor_->getFwdKinematicsManager()->removeFwdKinematicSolver(group_name.toStdString());
-      thor_->getInvKinematicsManager()->removeInvKinematicSolver(group_name.toStdString());
-      groups.erase(group_name.toStdString());
+      thor_->getManipulatorManager()->removeFwdKinematicSolver(group_name.toStdString());
+      thor_->getManipulatorManager()->removeInvKinematicSolver(group_name.toStdString());
+      this->thor_->getManipulatorManager()->removeChainGroup(group_name.toStdString());
     }
     else if (type == "Joint List")
     {
-      tesseract_scene_graph::JointGroups& groups = this->thor_->getSRDFModel()->getJointGroups();
-      thor_->getFwdKinematicsManager()->removeFwdKinematicSolver(group_name.toStdString());
-      thor_->getInvKinematicsManager()->removeInvKinematicSolver(group_name.toStdString());
-      groups.erase(group_name.toStdString());
+      thor_->getManipulatorManager()->removeFwdKinematicSolver(group_name.toStdString());
+      thor_->getManipulatorManager()->removeInvKinematicSolver(group_name.toStdString());
+      this->thor_->getManipulatorManager()->removeJointGroup(group_name.toStdString());
     }
     else if (type == "Link List")
     {
-      tesseract_scene_graph::LinkGroups& groups = this->thor_->getSRDFModel()->getLinkGroups();
-      thor_->getFwdKinematicsManager()->removeFwdKinematicSolver(group_name.toStdString());
-      thor_->getInvKinematicsManager()->removeInvKinematicSolver(group_name.toStdString());
-      groups.erase(group_name.toStdString());
+      thor_->getManipulatorManager()->removeFwdKinematicSolver(group_name.toStdString());
+      thor_->getManipulatorManager()->removeInvKinematicSolver(group_name.toStdString());
+      this->thor_->getManipulatorManager()->removeLinkGroup(group_name.toStdString());
     }
 
     return QStandardItemModel::removeRows(row, count, parent);

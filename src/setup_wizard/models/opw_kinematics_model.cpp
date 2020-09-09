@@ -63,7 +63,7 @@ void OPWKinematicsModel::setTesseract(tesseract::Tesseract::Ptr thor)
   this->clear();
   thor_ = thor;
 
-  for (const auto& group : thor_->getSRDFModelConst()->getGroupOPWKinematics())
+  for (const auto& group : thor_->getManipulatorManager()->getOPWKinematicsSolvers())
     addItem(QString::fromStdString(group.first), group.second);
 }
 
@@ -73,39 +73,37 @@ void OPWKinematicsModel::add(const QString& group_name,
                              double o1, double o2, double o3, double o4, double o5, double o6,
                              int sc1, int sc2, int sc3, int sc4, int sc5, int sc6)
 {
-  auto& group_opw_kinematics = thor_->getSRDFModel()->getGroupOPWKinematics();
-  auto group = group_opw_kinematics.find(group_name.toStdString());
+  const auto& group_opw_kinematics = thor_->getManipulatorManager()->getOPWKinematicsSolvers();
   bool add = false;
 
-  if (group == group_opw_kinematics.end())
-  {
+  if (group_opw_kinematics.find(group_name.toStdString()) == group_opw_kinematics.end())
     add = true;
-    group_opw_kinematics[group_name.toStdString()] = tesseract_scene_graph::OPWKinematicParameters();
-    group = group_opw_kinematics.find(group_name.toStdString());
-  }
 
-  group->second.a1 = a1;
-  group->second.a2 = a2;
-  group->second.b = b;
-  group->second.c1 = c1;
-  group->second.c2 = c2;
-  group->second.c3 = c3;
-  group->second.c4 = c4;
-  group->second.offsets[0] = o1;
-  group->second.offsets[1] = o2;
-  group->second.offsets[2] = o3;
-  group->second.offsets[3] = o4;
-  group->second.offsets[4] = o5;
-  group->second.offsets[5] = o6;
-  group->second.sign_corrections[0] = static_cast<signed char>(sc1);
-  group->second.sign_corrections[1] = static_cast<signed char>(sc2);
-  group->second.sign_corrections[2] = static_cast<signed char>(sc3);
-  group->second.sign_corrections[3] = static_cast<signed char>(sc4);
-  group->second.sign_corrections[4] = static_cast<signed char>(sc5);
-  group->second.sign_corrections[5] = static_cast<signed char>(sc6);
+  tesseract_scene_graph::OPWKinematicParameters opw_params;
+  opw_params.a1 = a1;
+  opw_params.a2 = a2;
+  opw_params.b = b;
+  opw_params.c1 = c1;
+  opw_params.c2 = c2;
+  opw_params.c3 = c3;
+  opw_params.c4 = c4;
+  opw_params.offsets[0] = o1;
+  opw_params.offsets[1] = o2;
+  opw_params.offsets[2] = o3;
+  opw_params.offsets[3] = o4;
+  opw_params.offsets[4] = o5;
+  opw_params.offsets[5] = o6;
+  opw_params.sign_corrections[0] = static_cast<signed char>(sc1);
+  opw_params.sign_corrections[1] = static_cast<signed char>(sc2);
+  opw_params.sign_corrections[2] = static_cast<signed char>(sc3);
+  opw_params.sign_corrections[3] = static_cast<signed char>(sc4);
+  opw_params.sign_corrections[4] = static_cast<signed char>(sc5);
+  opw_params.sign_corrections[5] = static_cast<signed char>(sc6);
+
+  thor_->getManipulatorManager()->addOPWKinematicsSolver(group_name.toStdString(), opw_params);
 
   if (add)
-    addItem(group_name, group->second);
+    addItem(group_name, opw_params);
   else // replace
     setTesseract(thor_);
 }
@@ -116,8 +114,7 @@ bool OPWKinematicsModel::removeRows(int row, int count, const QModelIndex &paren
   {
     QStandardItem *row_item = item(row);
     QString group_name = row_item->data(OPWKinematicsRoles::GroupNameRole).toString();
-    auto& group_opw = thor_->getSRDFModel()->getGroupOPWKinematics();
-    group_opw.erase(group_name.toStdString());
+    thor_->getManipulatorManager()->removeOPWKinematicsSovler(group_name.toStdString());
     return QStandardItemModel::removeRows(row, count, parent);
   }
   return false;

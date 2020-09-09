@@ -63,7 +63,7 @@ void UserDefinedTCPModel::setTesseract(tesseract::Tesseract::Ptr thor)
   thor_ = thor;
   QStandardItem *parent_item = this->invisibleRootItem();
   Eigen::IOFormat eigen_format(Eigen::StreamPrecision, 0, ",", ",");
-  for (const auto& group : thor_->getGroupTCPs())
+  for (const auto& group : thor_->getManipulatorManager()->getGroupTCPs())
   {
     for (const auto& tcp : group.second)
     {
@@ -90,7 +90,7 @@ void UserDefinedTCPModel::add(const QString& group_name,
 {
   QString tcp_name_trimmed = tcp_name.trimmed();
 
-  auto& group_tcps = thor_->getGroupTCPs();
+  const auto& group_tcps = thor_->getManipulatorManager()->getGroupTCPs();
   auto group = group_tcps.find(group_name.toStdString());
   bool add = true;
 
@@ -113,11 +113,11 @@ void UserDefinedTCPModel::add(const QString& group_name,
     if (s != group->second.end())
       add = false;
 
-    group->second[tcp_name.toStdString()] = tcp;
+    thor_->getManipulatorManager()->addGroupTCP(group_name.toStdString(), tcp_name.toStdString(), tcp);
   }
   else
   {
-    group_tcps[group_name.toStdString()][tcp_name_trimmed.toStdString()] = tcp;
+    thor_->getManipulatorManager()->addGroupTCP(group_name.toStdString(), tcp_name.toStdString(), tcp);
   }
 
   QStandardItem *parent_item = this->invisibleRootItem();
@@ -148,10 +148,7 @@ bool UserDefinedTCPModel::removeRows(int row, int count, const QModelIndex &pare
     QStandardItem *row_item = item(row);
     QString group_name = row_item->data(UserDefinedTCPRoles::GroupNameRole).toString();
     QString tcp_name = row_item->data(UserDefinedTCPRoles::TCPNameRole).toString();
-    auto& group_tcps = thor_->getGroupTCPs();
-    group_tcps[group_name.toStdString()].erase(tcp_name.toStdString());
-    if (group_tcps[group_name.toStdString()].empty())
-      group_tcps.erase(group_name.toStdString());
+    this->thor_->getManipulatorManager()->removeGroupTCP(group_name.toStdString(), tcp_name.toStdString());
 
     return QStandardItemModel::removeRows(row, count, parent);
   }
