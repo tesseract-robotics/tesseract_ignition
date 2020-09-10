@@ -4,6 +4,14 @@ Welcome to the Tesseract Igntion
 
 Buiding from source
 ===================
+Install Ignition Libraries:
+
+.. code-block:: bash
+
+   sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+   wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
+   sudo apt-get update
+   sudo apt install libignition-common3-dev libignition-common3-av-dev libignition-common3-events-dev libignition-common3-profiler-dev libignition-msgs5-dev libignition-rendering3-dev libignition-rendering3-ogre1-dev libignition-rendering3-ogre2-dev libignition-transport8-dev libignition-gui3-dev libignition-math6-eigen3-dev
 
 For ignition to find the plugins built by this package you must set the following environment variable.
 
