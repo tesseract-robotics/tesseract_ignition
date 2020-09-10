@@ -32,6 +32,7 @@
 
 #include <tesseract_ignition/conversions.h>
 #include <tesseract_geometry/geometries.h>
+#include <tesseract_visualization/ignition/conversions.h>
 
 namespace tesseract_ignition
 {
@@ -63,6 +64,13 @@ bool toScene(ignition::rendering::Scene& scene,
 
           auto shape = std::static_pointer_cast<const tesseract_geometry::Box>(vs->geometry);
           box->Scale(shape->getX(), shape->getY(), shape->getZ());
+
+          if (vs->material != nullptr && vs->material->getName() != "default_tesseract_material" &&  vs->material->texture_filename.empty())
+          {
+            const Eigen::Vector4d& rgba = vs->material->color;
+            box->Material()->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+          }
+
           ign_link->AddChild(box);
           break;
         }
@@ -75,6 +83,13 @@ bool toScene(ignition::rendering::Scene& scene,
 
           auto shape = std::static_pointer_cast<const tesseract_geometry::Sphere>(vs->geometry);
           sphere->Scale(shape->getRadius(), shape->getRadius(), shape->getRadius());
+
+          if (vs->material != nullptr && vs->material->getName() != "default_tesseract_material" &&  vs->material->texture_filename.empty())
+          {
+            const Eigen::Vector4d& rgba = vs->material->color;
+            sphere->Material()->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+          }
+
           ign_link->AddChild(sphere);
           break;
         }
@@ -87,6 +102,13 @@ bool toScene(ignition::rendering::Scene& scene,
 
           auto shape = std::static_pointer_cast<const tesseract_geometry::Cylinder>(vs->geometry);
           cylinder->Scale(shape->getRadius(), shape->getRadius(), shape->getLength());
+
+          if (vs->material != nullptr && vs->material->getName() != "default_tesseract_material" &&  vs->material->texture_filename.empty())
+          {
+            const Eigen::Vector4d& rgba = vs->material->color;
+            cylinder->Material()->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+          }
+
           ign_link->AddChild(cylinder);
           break;
         }
@@ -99,6 +121,13 @@ bool toScene(ignition::rendering::Scene& scene,
 
           auto shape = std::static_pointer_cast<const tesseract_geometry::Cone>(vs->geometry);
           cone->Scale(shape->getRadius(), shape->getRadius(), shape->getLength());
+
+          if (vs->material != nullptr && vs->material->getName() != "default_tesseract_material" &&  vs->material->texture_filename.empty())
+          {
+            const Eigen::Vector4d& rgba = vs->material->color;
+            cone->Material()->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+          }
+
           ign_link->AddChild(cone);
           break;
         }
@@ -108,7 +137,10 @@ bool toScene(ignition::rendering::Scene& scene,
           //          VisualPtr capsule = scene.CreateVisual(gv_id, gv_name);
           //          capsule->SetLocalPose(ignition::math::eigen3::convert(vs->origin));
           //          capsule->AddGeometry(scene.CreateCapsule());
-
+          //
+          //          const Eigen::Vector4d& rgba = vs->material->color;
+          //          capsule->Material()->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+          //
           //          auto shape = std::static_pointer_cast<const tesseract_geometry::Capsule>(vs->geometry);
           //          capsule->Scale(shape->getRadius(), shape->getRadius(), shape->getLength());
           //          ign_link->AddChild(capsule);
@@ -129,6 +161,13 @@ bool toScene(ignition::rendering::Scene& scene,
             ignition::common::MeshManager* mesh_manager = ignition::common::MeshManager::Instance();
             descriptor.mesh = mesh_manager->Load(descriptor.meshName);
             ignition::rendering::MeshPtr mesh_geom = scene.CreateMesh(descriptor);
+
+            if (!tesseract_visualization::isMeshWithColor(resource->getFilePath()) && vs->material != nullptr && vs->material->getName() != "default_tesseract_material" &&  vs->material->texture_filename.empty())
+            {
+              const Eigen::Vector4d& rgba = vs->material->color;
+              mesh->Material()->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+            }
+
             mesh->AddGeometry(mesh_geom);
             ign_link->AddChild(mesh);
           }
@@ -154,6 +193,13 @@ bool toScene(ignition::rendering::Scene& scene,
             ignition::common::MeshManager* mesh_manager = ignition::common::MeshManager::Instance();
             descriptor.mesh = mesh_manager->Load(descriptor.meshName);
             ignition::rendering::MeshPtr mesh_geom = scene.CreateMesh(descriptor);
+
+            if (!tesseract_visualization::isMeshWithColor(resource->getFilePath()) && vs->material != nullptr && vs->material->getName() != "default_tesseract_material" &&  vs->material->texture_filename.empty())
+            {
+              const Eigen::Vector4d& rgba = vs->material->color;
+              mesh->Material()->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+            }
+
             mesh->AddGeometry(mesh_geom);
             ign_link->AddChild(mesh);
           }
