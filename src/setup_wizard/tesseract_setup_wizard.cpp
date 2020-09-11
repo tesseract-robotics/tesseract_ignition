@@ -317,6 +317,7 @@ void TesseractSetupWizard::onGenerateACM(long resolution)
   for (long i = 0; i < resolution; ++i)
   {
     tesseract_environment::EnvState::Ptr state = state_solver->getRandomState();
+    contact_manager->setCollisionObjectsTransform(state->link_transforms);
     contact_manager->contactTest(results, request);
   }
 

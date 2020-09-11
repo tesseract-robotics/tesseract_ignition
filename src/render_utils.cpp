@@ -303,7 +303,6 @@ namespace tesseract_ignition
     else if (this->dataPtr->thor)
     {
       int revision = this->dataPtr->thor->getEnvironment()->getRevision();
-      assert(this->dataPtr->tesseract_revision == revision);
       if (!commands.empty())
       {
 //        if (revision > this->dataPtr->tesseract_revision)

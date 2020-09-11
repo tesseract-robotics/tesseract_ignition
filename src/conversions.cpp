@@ -68,7 +68,16 @@ bool toScene(ignition::rendering::Scene& scene,
           if (vs->material != nullptr && vs->material->getName() != "default_tesseract_material" &&  vs->material->texture_filename.empty())
           {
             const Eigen::Vector4d& rgba = vs->material->color;
-            box->Material()->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+            auto material = scene.Material(vs->material->getName());
+            if (material == nullptr)
+            {
+              // create gray material
+              material = scene.CreateMaterial(vs->material->getName());
+              material->SetAmbient(rgba(0), rgba(1), rgba(2), rgba(3));
+              material->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+              material->SetSpecular(rgba(0), rgba(1), rgba(2), rgba(3));
+            }
+            box->SetMaterial(material);
           }
 
           ign_link->AddChild(box);
@@ -87,7 +96,16 @@ bool toScene(ignition::rendering::Scene& scene,
           if (vs->material != nullptr && vs->material->getName() != "default_tesseract_material" &&  vs->material->texture_filename.empty())
           {
             const Eigen::Vector4d& rgba = vs->material->color;
-            sphere->Material()->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+            auto material = scene.Material(vs->material->getName());
+            if (material == nullptr)
+            {
+              // create gray material
+              material = scene.CreateMaterial(vs->material->getName());
+              material->SetAmbient(rgba(0), rgba(1), rgba(2), rgba(3));
+              material->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+              material->SetSpecular(rgba(0), rgba(1), rgba(2), rgba(3));
+            }
+            sphere->SetMaterial(material);
           }
 
           ign_link->AddChild(sphere);
@@ -106,7 +124,16 @@ bool toScene(ignition::rendering::Scene& scene,
           if (vs->material != nullptr && vs->material->getName() != "default_tesseract_material" &&  vs->material->texture_filename.empty())
           {
             const Eigen::Vector4d& rgba = vs->material->color;
-            cylinder->Material()->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+            auto material = scene.Material(vs->material->getName());
+            if (material == nullptr)
+            {
+              // create gray material
+              material = scene.CreateMaterial(vs->material->getName());
+              material->SetAmbient(rgba(0), rgba(1), rgba(2), rgba(3));
+              material->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+              material->SetSpecular(rgba(0), rgba(1), rgba(2), rgba(3));
+            }
+            cylinder->SetMaterial(material);
           }
 
           ign_link->AddChild(cylinder);
@@ -125,7 +152,16 @@ bool toScene(ignition::rendering::Scene& scene,
           if (vs->material != nullptr && vs->material->getName() != "default_tesseract_material" &&  vs->material->texture_filename.empty())
           {
             const Eigen::Vector4d& rgba = vs->material->color;
-            cone->Material()->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+            auto material = scene.Material(vs->material->getName());
+            if (material == nullptr)
+            {
+              // create gray material
+              material = scene.CreateMaterial(vs->material->getName());
+              material->SetAmbient(rgba(0), rgba(1), rgba(2), rgba(3));
+              material->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+              material->SetSpecular(rgba(0), rgba(1), rgba(2), rgba(3));
+            }
+            cone->SetMaterial(material);
           }
 
           ign_link->AddChild(cone);
@@ -138,8 +174,20 @@ bool toScene(ignition::rendering::Scene& scene,
           //          capsule->SetLocalPose(ignition::math::eigen3::convert(vs->origin));
           //          capsule->AddGeometry(scene.CreateCapsule());
           //
-          //          const Eigen::Vector4d& rgba = vs->material->color;
-          //          capsule->Material()->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+          //          if (vs->material != nullptr && vs->material->getName() != "default_tesseract_material" &&  vs->material->texture_filename.empty())
+          //          {
+          //            const Eigen::Vector4d& rgba = vs->material->color;
+          //            auto material = scene.Material(vs->material->getName());
+          //            if (material == nullptr)
+          //            {
+          //              // create gray material
+          //              material = scene.CreateMaterial(vs->material->getName());
+          //              material->SetAmbient(rgba(0), rgba(1), rgba(2), rgba(3));
+          //              material->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+          //              material->SetSpecular(rgba(0), rgba(1), rgba(2), rgba(3));
+          //            }
+          //            capsule->SetMaterial(material);
+          //          }
           //
           //          auto shape = std::static_pointer_cast<const tesseract_geometry::Capsule>(vs->geometry);
           //          capsule->Scale(shape->getRadius(), shape->getRadius(), shape->getLength());
@@ -165,7 +213,16 @@ bool toScene(ignition::rendering::Scene& scene,
             if (!tesseract_visualization::isMeshWithColor(resource->getFilePath()) && vs->material != nullptr && vs->material->getName() != "default_tesseract_material" &&  vs->material->texture_filename.empty())
             {
               const Eigen::Vector4d& rgba = vs->material->color;
-              mesh->Material()->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+              auto material = scene.Material(vs->material->getName());
+              if (material == nullptr)
+              {
+                // create gray material
+                material = scene.CreateMaterial(vs->material->getName());
+                material->SetAmbient(rgba(0), rgba(1), rgba(2), rgba(3));
+                material->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+                material->SetSpecular(rgba(0), rgba(1), rgba(2), rgba(3));
+              }
+              mesh_geom->SetMaterial(material);
             }
 
             mesh->AddGeometry(mesh_geom);
@@ -197,7 +254,16 @@ bool toScene(ignition::rendering::Scene& scene,
             if (!tesseract_visualization::isMeshWithColor(resource->getFilePath()) && vs->material != nullptr && vs->material->getName() != "default_tesseract_material" &&  vs->material->texture_filename.empty())
             {
               const Eigen::Vector4d& rgba = vs->material->color;
-              mesh->Material()->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+              auto material = scene.Material(vs->material->getName());
+              if (material == nullptr)
+              {
+                // create gray material
+                material = scene.CreateMaterial(vs->material->getName());
+                material->SetAmbient(rgba(0), rgba(1), rgba(2), rgba(3));
+                material->SetDiffuse(rgba(0), rgba(1), rgba(2), rgba(3));
+                material->SetSpecular(rgba(0), rgba(1), rgba(2), rgba(3));
+              }
+              mesh_geom->SetMaterial(material);
             }
 
             mesh->AddGeometry(mesh_geom);
