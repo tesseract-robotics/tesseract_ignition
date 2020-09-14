@@ -50,8 +50,10 @@ Install Snapcraft
 Build Snap
 ----------
 
-* 'cd snapcraft'
-* 'SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=16G snapcraft --enable-experimental-package-repositories`
+* `cd snapcraft`
+* `SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=16G snapcraft --enable-experimental-package-repositories`
+* Alternative Using LXD
+  * `SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=16G snapcraft --enable-experimental-package-repositories --use-lxd`
 
 .. note::
 
