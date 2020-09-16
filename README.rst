@@ -50,7 +50,7 @@ Install Snapcraft
 Build Snap
 ----------
 
-* `cd snapcraft`
+* `cd <workspace>`
 * `SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=16G snapcraft --enable-experimental-package-repositories`
 * Alternative Using LXD
   * `SNAPCRAFT_BUILD_ENVIRONMENT_MEMORY=16G snapcraft --enable-experimental-package-repositories --use-lxd`
@@ -62,7 +62,7 @@ Build Snap
 Test Snap
 ---------
 
-* `snap install --dangerous --classic tesseract-ignition_X.X_amd64.snap`
+* `snap install --dangerous tesseract-ignition_X.X_amd64.snap`
 * `snap connect tesseract-ignition:hostfs-opt-ros`
 * Verify connection `snap connections tesseract-ignition`
 
