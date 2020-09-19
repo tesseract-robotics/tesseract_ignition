@@ -302,9 +302,9 @@ namespace tesseract_ignition
     }
     else if (this->dataPtr->thor)
     {
-      int revision = this->dataPtr->thor->getEnvironment()->getRevision();
-      if (!commands.empty())
-      {
+//      int revision = this->dataPtr->thor->getEnvironment()->getRevision();
+//      if (!commands.empty())
+//      {
 //        if (revision > this->dataPtr->tesseract_revision)
 //        {
 //          auto history = this->dataPtr->thor->getEnvironment()->getCommandHistory();
@@ -313,7 +313,7 @@ namespace tesseract_ignition
           // Store new revision number
 //          this->dataPtr->tesseract_revision = revision;
 //        }
-      }
+//      }
 
       if (!transforms.empty())
       {
