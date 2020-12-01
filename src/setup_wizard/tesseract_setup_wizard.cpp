@@ -192,7 +192,10 @@ void TesseractSetupWizard::onLoad(const QString &urdf_filepath, const QString& s
 void TesseractSetupWizard::onSave(const QString& srdf_filepath)
 {
   std::string local_path = this->data_->locator->locateResource(srdf_filepath.toStdString())->getFilePath();
-  this->data_->render_util.getTesseract()->getManipulatorManager()->getSRDFModel()->saveToFile(local_path);
+  tesseract_scene_graph::SRDFModel srdf_model;
+  srdf_model.getAllowedCollisionMatrix() = *(this->data_->render_util.getTesseract()->getEnvironment()->getAllowedCollisionMatrix());
+  srdf_model.getKinematicsInformation() = this->data_->render_util.getTesseract()->getEnvironment()->getManipulatorManager()->getKinematicsInformation();
+  srdf_model.saveToFile(local_path);
 }
 
 void TesseractSetupWizard::onAddChainGroup(const QString &group_name, const QString& base_link, const QString& tip_link)
@@ -202,7 +205,7 @@ void TesseractSetupWizard::onAddChainGroup(const QString &group_name, const QStr
     return;
 
   QStringList list = {base_link, tip_link};
-  std::vector<std::string> groups = this->data_->render_util.getTesseract()->getManipulatorManager()->getAvailableFwdKinematicsManipulators();
+  std::vector<std::string> groups = this->data_->render_util.getTesseract()->getEnvironment()->getManipulatorManager()->getAvailableFwdKinematicsManipulators();
   this->data_->kin_groups_model.add(group_name, CHAIN_GROUP, list);
   if (!group_name.isEmpty())
   {
@@ -222,7 +225,7 @@ void TesseractSetupWizard::onAddJointGroup(const QString &group_name)
   if (group_name.trimmed().isEmpty())
     return;
 
-  std::vector<std::string> groups = this->data_->render_util.getTesseract()->getManipulatorManager()->getAvailableFwdKinematicsManipulators();
+  std::vector<std::string> groups = this->data_->render_util.getTesseract()->getEnvironment()->getManipulatorManager()->getAvailableFwdKinematicsManipulators();
   this->data_->kin_groups_model.add(group_name, JOINT_LIST_GROUP, this->data_->group_joint_list_model.stringList());
   if (!group_name.isEmpty())
   {
@@ -242,7 +245,7 @@ void TesseractSetupWizard::onAddLinkGroup(const QString &group_name)
   if (group_name.trimmed().isEmpty())
     return;
 
-  std::vector<std::string> groups = this->data_->render_util.getTesseract()->getManipulatorManager()->getAvailableFwdKinematicsManipulators();
+  std::vector<std::string> groups = this->data_->render_util.getTesseract()->getEnvironment()->getManipulatorManager()->getAvailableFwdKinematicsManipulators();
   this->data_->kin_groups_model.add(group_name, LINK_LIST_GROUP, this->data_->group_link_list_model.stringList());
   if (!group_name.isEmpty())
   {
@@ -304,7 +307,7 @@ void TesseractSetupWizard::onRemoveKinematicGroup(int index)
 void TesseractSetupWizard::onGenerateACM(long resolution)
 {
   auto env = this->data_->render_util.getTesseract()->getEnvironment();
-  auto manip_manager = this->data_->render_util.getTesseract()->getManipulatorManager();
+  auto manip_manager = this->data_->render_util.getTesseract()->getEnvironment()->getManipulatorManager();
   auto contact_manager = env->getDiscreteContactManager();
   auto state_solver = env->getStateSolver();
 
@@ -330,20 +333,11 @@ void TesseractSetupWizard::onGenerateACM(long resolution)
       std::vector<std::string> adj_first = env->getSceneGraph()->getAdjacentLinkNames(pair.first.first);
       std::vector<std::string> adj_second = env->getSceneGraph()->getAdjacentLinkNames(pair.first.second);
       if (std::find(adj_first.begin(), adj_first.end(), pair.first.second) != adj_first.end())
-      {
         env->addAllowedCollision(pair.first.first, pair.first.second, "Adjacent");
-        manip_manager->addAllowedCollision(pair.first.first, pair.first.second, "Adjacent");
-      }
       else if (std::find(adj_second.begin(), adj_second.end(), pair.first.first) != adj_second.end())
-      {
         env->addAllowedCollision(pair.first.second, pair.first.first, "Adjacent");
-        manip_manager->addAllowedCollision(pair.first.first, pair.first.second, "Adjacent");
-      }
       else
-      {
         env->addAllowedCollision(pair.first.second, pair.first.first, "Allways");
-        manip_manager->addAllowedCollision(pair.first.first, pair.first.second, "Allways");
-      }
     }
   }
 
@@ -361,10 +355,7 @@ void TesseractSetupWizard::onGenerateACM(long resolution)
         continue;
 
       if (results.find(tesseract_collision::getObjectPairKey(link_names[i], link_names[j])) == results.end())
-      {
         env->addAllowedCollision(link_names[i], link_names[j], "Never");
-        manip_manager->addAllowedCollision(link_names[i], link_names[j], "Never");
-      }
     }
   }
 
@@ -386,7 +377,7 @@ void TesseractSetupWizard::onClickedACMEntry(int /*index*/)
 void TesseractSetupWizard::onLoadJointGroup(const QString &group_name)
 {
   this->data_->joint_group_model.clear();
-  auto kin = this->data_->render_util.getTesseractConst()->getManipulatorManager()->getFwdKinematicSolver(group_name.toStdString());
+  auto kin = this->data_->render_util.getTesseractConst()->getEnvironment()->getManipulatorManager()->getFwdKinematicSolver(group_name.toStdString());
   if (kin != nullptr)
     for (const auto& joint_name : kin->getJointNames())
       this->data_->joint_group_model.add(this->data_->render_util.getTesseractConst()->getEnvironment()->getSceneGraph()->getJoint(joint_name));
