@@ -63,7 +63,7 @@ void UserDefinedTCPModel::setTesseract(tesseract::Tesseract::Ptr thor)
   thor_ = thor;
   QStandardItem *parent_item = this->invisibleRootItem();
   Eigen::IOFormat eigen_format(Eigen::StreamPrecision, 0, ",", ",");
-  for (const auto& group : thor_->getManipulatorManager()->getGroupTCPs())
+  for (const auto& group : thor_->getEnvironment()->getManipulatorManager()->getGroupTCPs())
   {
     for (const auto& tcp : group.second)
     {
@@ -90,7 +90,7 @@ void UserDefinedTCPModel::add(const QString& group_name,
 {
   QString tcp_name_trimmed = tcp_name.trimmed();
 
-  const auto& group_tcps = thor_->getManipulatorManager()->getGroupTCPs();
+  const auto& group_tcps = thor_->getEnvironment()->getManipulatorManager()->getGroupTCPs();
   auto group = group_tcps.find(group_name.toStdString());
   bool add = true;
 
@@ -113,11 +113,11 @@ void UserDefinedTCPModel::add(const QString& group_name,
     if (s != group->second.end())
       add = false;
 
-    thor_->getManipulatorManager()->addGroupTCP(group_name.toStdString(), tcp_name.toStdString(), tcp);
+    thor_->getEnvironment()->getManipulatorManager()->addGroupTCP(group_name.toStdString(), tcp_name.toStdString(), tcp);
   }
   else
   {
-    thor_->getManipulatorManager()->addGroupTCP(group_name.toStdString(), tcp_name.toStdString(), tcp);
+    thor_->getEnvironment()->getManipulatorManager()->addGroupTCP(group_name.toStdString(), tcp_name.toStdString(), tcp);
   }
 
   QStandardItem *parent_item = this->invisibleRootItem();
@@ -148,7 +148,7 @@ bool UserDefinedTCPModel::removeRows(int row, int count, const QModelIndex &pare
     QStandardItem *row_item = item(row);
     QString group_name = row_item->data(UserDefinedTCPRoles::GroupNameRole).toString();
     QString tcp_name = row_item->data(UserDefinedTCPRoles::TCPNameRole).toString();
-    this->thor_->getManipulatorManager()->removeGroupTCP(group_name.toStdString(), tcp_name.toStdString());
+    this->thor_->getEnvironment()->getManipulatorManager()->removeGroupTCP(group_name.toStdString(), tcp_name.toStdString());
 
     return QStandardItemModel::removeRows(row, count, parent);
   }
