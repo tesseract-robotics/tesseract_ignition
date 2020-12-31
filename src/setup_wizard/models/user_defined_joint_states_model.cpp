@@ -37,12 +37,12 @@ UserDefinedJointStatesModel::UserDefinedJointStatesModel(QObject *parent)
 UserDefinedJointStatesModel::UserDefinedJointStatesModel(const UserDefinedJointStatesModel &other)
   : QStandardItemModel(other.d_ptr->parent)
 {
-  this->thor_ = other.thor_;
+  this->env_ = other.env_;
 }
 
 UserDefinedJointStatesModel &UserDefinedJointStatesModel::operator=(const UserDefinedJointStatesModel &other)
 {
-  this->thor_ = other.thor_;
+  this->env_ = other.env_;
   return *this;
 }
 
@@ -56,12 +56,12 @@ QHash<int, QByteArray> UserDefinedJointStatesModel::roleNames() const
     return roles;
 }
 
-void UserDefinedJointStatesModel::setTesseract(tesseract::Tesseract::Ptr thor)
+void UserDefinedJointStatesModel::setEnvironment(tesseract_environment::Environment::Ptr env)
 {
   this->clear();
-  thor_ = thor;
+  env_ = env;
   QStandardItem *parent_item = this->invisibleRootItem();
-  for (const auto& group : thor_->getManipulatorManager()->getGroupJointStates())
+  for (const auto& group : env_->getManipulatorManager()->getGroupJointStates())
   {
     for (const auto& state : group.second)
     {
@@ -92,7 +92,7 @@ void UserDefinedJointStatesModel::add(const QString& group_name,
 {
   QString state_name_trimmed = state_name.trimmed();
 
-  const auto& group_states = thor_->getManipulatorManager()->getGroupJointStates();
+  const auto& group_states = env_->getManipulatorManager()->getGroupJointStates();
   auto group = group_states.find(group_name.toStdString());
   bool add = true;
 
@@ -106,13 +106,13 @@ void UserDefinedJointStatesModel::add(const QString& group_name,
     if (s != group->second.end())
       add = false;
 
-    thor_->getManipulatorManager()->addGroupJointState(group_name.toStdString(), state_name_trimmed.toStdString(), state);
+    env_->getManipulatorManager()->addGroupJointState(group_name.toStdString(), state_name_trimmed.toStdString(), state);
   }
   else
   {
     tesseract_scene_graph::GroupsJointStates states;
     states[state_name.toStdString()] = state;
-    thor_->getManipulatorManager()->addGroupJointState(group_name.toStdString(), state_name_trimmed.toStdString(), state);
+    env_->getManipulatorManager()->addGroupJointState(group_name.toStdString(), state_name_trimmed.toStdString(), state);
   }
 
   QStandardItem *parent_item = this->invisibleRootItem();
@@ -127,7 +127,7 @@ void UserDefinedJointStatesModel::add(const QString& group_name,
   }
   else // replace
   {
-    setTesseract(thor_);
+    setEnvironment(env_);
   }
 }
 
@@ -138,7 +138,7 @@ bool UserDefinedJointStatesModel::removeRows(int row, int count, const QModelInd
     QStandardItem *row_item = item(row);
     QString group_name = row_item->data(UserDefinedJointStatesRoles::GroupNameRole).toString();
     QString state_name = row_item->data(UserDefinedJointStatesRoles::StateNameRole).toString();
-    thor_->getManipulatorManager()->removeGroupJointState(group_name.toStdString(), state_name.toStdString());
+    env_->getManipulatorManager()->removeGroupJointState(group_name.toStdString(), state_name.toStdString());
 
     return QStandardItemModel::removeRows(row, count, parent);
   }

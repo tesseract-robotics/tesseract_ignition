@@ -27,7 +27,7 @@
 #define TESSERACT_IGNITION_KINEMATIC_GROUPS_MODEL_H
 
 #ifndef Q_MOC_RUN
-#include <tesseract/tesseract.h>
+#include <tesseract_environment/core/environment.h>
 #include <QStandardItemModel>
 #include <QMetaType>
 #endif
@@ -51,14 +51,14 @@ public:
   KinematicGroupsModel &operator=(const KinematicGroupsModel &other);
   ~KinematicGroupsModel() override = default;
 
-  Q_INVOKABLE void setTesseract(tesseract::Tesseract::Ptr thor);
+  Q_INVOKABLE void setEnvironment(tesseract_environment::Environment::Ptr env);
   Q_INVOKABLE void add(const QString& group_name, const QString& type, const QStringList& data);
 
   QHash<int, QByteArray> roleNames() const override;
   bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
 private:
-  tesseract::Tesseract::Ptr thor_ {nullptr};
+  tesseract_environment::Environment::Ptr env_ {nullptr};
 };
 }
 #endif // TESSERACT_IGNITION_KINEMATIC_GROUPS_MODEL_H

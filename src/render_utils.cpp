@@ -37,7 +37,6 @@
 
 #include <tesseract_ignition/render_utils.h>
 #include <tesseract_ignition/conversions.h>
-#include <tesseract/tesseract.h>
 
 namespace tesseract_ignition
 {
@@ -50,20 +49,20 @@ namespace tesseract_ignition
       /** @brief This indicates that the environment should be loaded */
       bool load_environment{false};
 
-      /** @brief The Tesseract Entity Manager */
+      /** @brief The Environment Entity Manager */
       tesseract_visualization::EntityManager entity_manager;
 
-      /** @brief The Tesseract Object */
-      tesseract::Tesseract::Ptr thor;
+      /** @brief The Environment Object */
+      tesseract_environment::Environment::Ptr env;
 
-      /** @brief Set Tesseract commands to be applied to the scene and tesseract environment */
+      /** @brief Set Environment commands to be applied to the scene and tesseract environment */
       tesseract_environment::Commands commands;
 
-      /** @brief Set Tesseract transforms to be applied to the scene and tesseract environment */
+      /** @brief Set Environment transforms to be applied to the scene and tesseract environment */
       tesseract_common::TransformMap transfroms;
 
-      /** @brief This stores the tesseract revision number to determine if new objects should be added */
-      int tesseract_revision {-1};
+      /** @brief This stores the Environment revision number to determine if new objects should be added */
+      int environment_revision {-1};
 
       /** @brief Total time elapsed in simulation. This will not increase while paused. */
       std::chrono::steady_clock::duration sim_time{0};
@@ -196,21 +195,21 @@ namespace tesseract_ignition
   bool RenderUtil::isInitialized() const { return this->dataPtr->initialized; }
 
   //////////////////////////////////////////////////
-  void RenderUtil::setTesseract(tesseract::Tesseract::Ptr tesseract)
+  void RenderUtil::setEnvironment(tesseract_environment::Environment::Ptr env)
   {
-    this->dataPtr->thor = tesseract;
-    this->dataPtr->tesseract_revision = this->dataPtr->thor->getEnvironment()->getRevision();
+    this->dataPtr->env = env;
+    this->dataPtr->environment_revision = this->dataPtr->env->getRevision();
     this->dataPtr->load_environment = true;
   }
 
   //////////////////////////////////////////////////
-  tesseract::Tesseract::Ptr RenderUtil::getTesseract() { return this->dataPtr->thor; }
+  tesseract_environment::Environment::Ptr RenderUtil::getEnvironment() { return this->dataPtr->env; }
 
   //////////////////////////////////////////////////
-  tesseract::Tesseract::ConstPtr RenderUtil::getTesseractConst() const { return this->dataPtr->thor; }
+  tesseract_environment::Environment::ConstPtr RenderUtil::getEnvironmentConst() const { return this->dataPtr->env; }
 
   //////////////////////////////////////////////////
-  void RenderUtil::setTesseractCommands(tesseract_environment::Commands commands)
+  void RenderUtil::setEnvironmentCommands(tesseract_environment::Commands commands)
   {
     this->dataPtr->update_mutex.lock();
     this->dataPtr->commands = std::move(commands);
@@ -218,31 +217,31 @@ namespace tesseract_ignition
   }
 
   //////////////////////////////////////////////////
-  void RenderUtil::setTesseractState(const std::unordered_map<std::string, double>& joints)
+  void RenderUtil::setEnvironmentState(const std::unordered_map<std::string, double>& joints)
   {
     this->dataPtr->update_mutex.lock();
-    this->dataPtr->thor->getEnvironment()->setState(joints);
-    this->dataPtr->transfroms = this->dataPtr->thor->getEnvironment()->getCurrentState()->link_transforms;
+    this->dataPtr->env->setState(joints);
+    this->dataPtr->transfroms = this->dataPtr->env->getCurrentState()->link_transforms;
     this->dataPtr->update_mutex.unlock();
   }
 
   //////////////////////////////////////////////////
-  void RenderUtil::setTesseractState(const std::vector<std::string>& joint_names,
+  void RenderUtil::setEnvironmentState(const std::vector<std::string>& joint_names,
                                      const std::vector<double>& joint_values)
   {
     this->dataPtr->update_mutex.lock();
-    this->dataPtr->thor->getEnvironment()->setState(joint_names, joint_values);
-    this->dataPtr->transfroms = this->dataPtr->thor->getEnvironment()->getCurrentState()->link_transforms;
+    this->dataPtr->env->setState(joint_names, joint_values);
+    this->dataPtr->transfroms = this->dataPtr->env->getCurrentState()->link_transforms;
     this->dataPtr->update_mutex.unlock();
   }
 
   //////////////////////////////////////////////////
-  void RenderUtil::setTesseractState(const std::vector<std::string>& joint_names,
+  void RenderUtil::setEnvironmentState(const std::vector<std::string>& joint_names,
                          const Eigen::Ref<const Eigen::VectorXd>& joint_values)
   {
     this->dataPtr->update_mutex.lock();
-    this->dataPtr->thor->getEnvironment()->setState(joint_names, joint_values);
-    this->dataPtr->transfroms = this->dataPtr->thor->getEnvironment()->getCurrentState()->link_transforms;
+    this->dataPtr->env->setState(joint_names, joint_values);
+    this->dataPtr->transfroms = this->dataPtr->env->getCurrentState()->link_transforms;
     this->dataPtr->update_mutex.unlock();
   }
 
@@ -264,7 +263,7 @@ namespace tesseract_ignition
   //////////////////////////////////////////////////
   void RenderUtil::update()
   {
-    if (!this->dataPtr->initialized || !this->dataPtr->scene || !this->dataPtr->thor)
+    if (!this->dataPtr->initialized || !this->dataPtr->scene || !this->dataPtr->env)
       return;
 
     this->dataPtr->update_mutex.lock();
@@ -293,14 +292,14 @@ namespace tesseract_ignition
       this->dataPtr->entity_manager.clear();
 
       // Load Ignition Scene
-      const tesseract_environment::EnvState::ConstPtr& state = this->dataPtr->thor->getEnvironment()->getCurrentState();
-      toScene(*(this->dataPtr->scene), this->dataPtr->entity_manager, *(this->dataPtr->thor->getEnvironment()->getSceneGraph()), state->link_transforms);
+      const tesseract_environment::EnvState::ConstPtr& state = this->dataPtr->env->getCurrentState();
+      toScene(*(this->dataPtr->scene), this->dataPtr->entity_manager, *(this->dataPtr->env->getSceneGraph()), state->link_transforms);
 
       showGrid();
       showWorldAxis();
       this->dataPtr->load_environment = false;
     }
-    else if (this->dataPtr->thor)
+    else if (this->dataPtr->env)
     {
 //      int revision = this->dataPtr->thor->getEnvironment()->getRevision();
 //      if (!commands.empty())
@@ -317,7 +316,7 @@ namespace tesseract_ignition
 
       if (!transforms.empty())
       {
-        const tesseract_environment::EnvState::ConstPtr& state = this->dataPtr->thor->getEnvironment()->getCurrentState();
+        const tesseract_environment::EnvState::ConstPtr& state = this->dataPtr->env->getCurrentState();
         for (const auto& link : state->link_transforms)
         {
           ignition::rendering::VisualPtr v = this->dataPtr->scene->VisualByName(link.first);

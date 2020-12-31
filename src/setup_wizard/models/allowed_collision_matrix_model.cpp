@@ -36,12 +36,12 @@ AllowedCollisionMatrixModel::AllowedCollisionMatrixModel(QObject *parent)
 AllowedCollisionMatrixModel::AllowedCollisionMatrixModel(const AllowedCollisionMatrixModel &other)
   : QStandardItemModel(other.d_ptr->parent)
 {
-  this->thor_ = other.thor_;
+  this->env_ = other.env_;
 }
 
 AllowedCollisionMatrixModel &AllowedCollisionMatrixModel::operator=(const AllowedCollisionMatrixModel &other)
 {
-  this->thor_ = other.thor_;
+  this->env_ = other.env_;
   return *this;
 }
 
@@ -54,12 +54,12 @@ QHash<int, QByteArray> AllowedCollisionMatrixModel::roleNames() const
     return roles;
 }
 
-void AllowedCollisionMatrixModel::setTesseract(tesseract::Tesseract::Ptr thor)
+void AllowedCollisionMatrixModel::setEnvironment(tesseract_environment::Environment::Ptr env)
 {
   QStandardItemModel::clear();
-  thor_ = thor;
+  env_ = env;
   QStandardItem *parent_item = this->invisibleRootItem();
-  for (const auto& ac : thor_->getEnvironment()->getSceneGraph()->getAllowedCollisionMatrix()->getAllAllowedCollisions())
+  for (const auto& ac : env_->getSceneGraph()->getAllowedCollisionMatrix()->getAllAllowedCollisions())
   {
     auto item = new QStandardItem();
     item->setData(QString::fromStdString(ac.first.first), AllowedCollisionMatrixRoles::Link1Role);
@@ -72,7 +72,7 @@ void AllowedCollisionMatrixModel::setTesseract(tesseract::Tesseract::Ptr thor)
 
 void AllowedCollisionMatrixModel::add(const QString& link_name1, const QString& link_name2, const QString& reason)
 {
-  thor_->getEnvironment()->addAllowedCollision(link_name1.toStdString(), link_name2.toStdString(), reason.toStdString());
+  env_->addAllowedCollision(link_name1.toStdString(), link_name2.toStdString(), reason.toStdString());
   QStandardItem *parent_item = this->invisibleRootItem();
   auto item = new QStandardItem();
   item->setData(link_name1, AllowedCollisionMatrixRoles::Link1Role);
@@ -82,8 +82,8 @@ void AllowedCollisionMatrixModel::add(const QString& link_name1, const QString& 
   sort(0);
 
   // If the count does not match then it was a replace so rebuild model.
-  if (parent_item->rowCount() != static_cast<int>(thor_->getEnvironment()->getSceneGraph()->getAllowedCollisionMatrix()->getAllAllowedCollisions().size()))
-    setTesseract(thor_);
+  if (parent_item->rowCount() != static_cast<int>(env_->getSceneGraph()->getAllowedCollisionMatrix()->getAllAllowedCollisions().size()))
+    setEnvironment(env_);
 }
 
 bool AllowedCollisionMatrixModel::removeRows(int row, int count, const QModelIndex &parent)
@@ -93,7 +93,7 @@ bool AllowedCollisionMatrixModel::removeRows(int row, int count, const QModelInd
     QStandardItem *row_item = item(row);
     QString link1_name = row_item->data(AllowedCollisionMatrixRoles::Link1Role).toString();
     QString link2_name = row_item->data(AllowedCollisionMatrixRoles::Link2Role).toString();
-    thor_->getEnvironment()->removeAllowedCollision(link1_name.toStdString(), link2_name.toStdString());
+    env_->removeAllowedCollision(link1_name.toStdString(), link2_name.toStdString());
 
     return QStandardItemModel::removeRows(row, count, parent);
   }
@@ -103,11 +103,11 @@ bool AllowedCollisionMatrixModel::removeRows(int row, int count, const QModelInd
 void AllowedCollisionMatrixModel::clear()
 {
   QStandardItemModel::clear();
-  if (thor_)
+  if (env_)
   {
-    tesseract_scene_graph::AllowedCollisionMatrix acm(*(thor_->getEnvironment()->getSceneGraph()->getAllowedCollisionMatrix()));
+    tesseract_scene_graph::AllowedCollisionMatrix acm(*(env_->getSceneGraph()->getAllowedCollisionMatrix()));
     for (const auto& entry : acm.getAllAllowedCollisions())
-      thor_->getEnvironment()->removeAllowedCollision(entry.first.first, entry.first.second);
+      env_->removeAllowedCollision(entry.first.first, entry.first.second);
   }
 }
 

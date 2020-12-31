@@ -39,12 +39,12 @@ OPWKinematicsModel::OPWKinematicsModel(QObject *parent)
 OPWKinematicsModel::OPWKinematicsModel(const OPWKinematicsModel &other)
   : QStandardItemModel(other.d_ptr->parent)
 {
-  this->thor_ = other.thor_;
+  this->env_ = other.env_;
 }
 
 OPWKinematicsModel &OPWKinematicsModel::operator=(const OPWKinematicsModel &other)
 {
-  this->thor_ = other.thor_;
+  this->env_ = other.env_;
   return *this;
 }
 
@@ -58,12 +58,12 @@ QHash<int, QByteArray> OPWKinematicsModel::roleNames() const
     return roles;
 }
 
-void OPWKinematicsModel::setTesseract(tesseract::Tesseract::Ptr thor)
+void OPWKinematicsModel::setEnvironment(tesseract_environment::Environment::Ptr env)
 {
   this->clear();
-  thor_ = thor;
+  env_ = env;
 
-  for (const auto& group : thor_->getManipulatorManager()->getOPWKinematicsSolvers())
+  for (const auto& group : env_->getManipulatorManager()->getOPWKinematicsSolvers())
     addItem(QString::fromStdString(group.first), group.second);
 }
 
@@ -73,7 +73,7 @@ void OPWKinematicsModel::add(const QString& group_name,
                              double o1, double o2, double o3, double o4, double o5, double o6,
                              int sc1, int sc2, int sc3, int sc4, int sc5, int sc6)
 {
-  const auto& group_opw_kinematics = thor_->getManipulatorManager()->getOPWKinematicsSolvers();
+  const auto& group_opw_kinematics = env_->getManipulatorManager()->getOPWKinematicsSolvers();
   bool add = false;
 
   if (group_opw_kinematics.find(group_name.toStdString()) == group_opw_kinematics.end())
@@ -100,12 +100,12 @@ void OPWKinematicsModel::add(const QString& group_name,
   opw_params.sign_corrections[4] = static_cast<signed char>(sc5);
   opw_params.sign_corrections[5] = static_cast<signed char>(sc6);
 
-  thor_->getManipulatorManager()->addOPWKinematicsSolver(group_name.toStdString(), opw_params);
+  env_->getManipulatorManager()->addOPWKinematicsSolver(group_name.toStdString(), opw_params);
 
   if (add)
     addItem(group_name, opw_params);
   else // replace
-    setTesseract(thor_);
+    setEnvironment(env_);
 }
 
 bool OPWKinematicsModel::removeRows(int row, int count, const QModelIndex &parent)
@@ -114,7 +114,7 @@ bool OPWKinematicsModel::removeRows(int row, int count, const QModelIndex &paren
   {
     QStandardItem *row_item = item(row);
     QString group_name = row_item->data(OPWKinematicsRoles::GroupNameRole).toString();
-    thor_->getManipulatorManager()->removeOPWKinematicsSovler(group_name.toStdString());
+    env_->getManipulatorManager()->removeOPWKinematicsSovler(group_name.toStdString());
     return QStandardItemModel::removeRows(row, count, parent);
   }
   return false;

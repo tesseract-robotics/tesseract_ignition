@@ -27,7 +27,7 @@
 #define TESSERACT_IGNITION_USER_DEFINED_JOINT_STATES_MODEL_H
 
 #ifndef Q_MOC_RUN
-#include <tesseract/tesseract.h>
+#include <tesseract_environment/core/environment.h>
 #include <QStandardItemModel>
 #include <QMetaType>
 #include <QMap>
@@ -53,7 +53,7 @@ public:
   UserDefinedJointStatesModel &operator=(const UserDefinedJointStatesModel &other);
   ~UserDefinedJointStatesModel() override = default;
 
-  Q_INVOKABLE void setTesseract(tesseract::Tesseract::Ptr thor);
+  Q_INVOKABLE void setEnvironment(tesseract_environment::Environment::Ptr env);
   Q_INVOKABLE void add(const QString& group_name,
                        const QString& state_name,
                        const QStringList &joint_names,
@@ -63,7 +63,7 @@ public:
   bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
 private:
-  tesseract::Tesseract::Ptr thor_ {nullptr};
+  tesseract_environment::Environment::Ptr env_ {nullptr};
 };
 
 }

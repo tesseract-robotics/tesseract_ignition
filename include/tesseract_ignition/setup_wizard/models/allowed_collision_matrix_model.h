@@ -27,7 +27,7 @@
 #define TESSERACT_IGNITION_ALLOWED_COLLISION_MATRIX_MODEL_H
 
 #ifndef Q_MOC_RUN
-#include <tesseract/tesseract.h>
+#include <tesseract_environment/core/environment.h>
 #include <QStandardItemModel>
 #include <QMetaType>
 #endif
@@ -49,7 +49,7 @@ public:
   AllowedCollisionMatrixModel &operator=(const AllowedCollisionMatrixModel &other);
   ~AllowedCollisionMatrixModel() override = default;
 
-  Q_INVOKABLE void setTesseract(tesseract::Tesseract::Ptr thor);
+  Q_INVOKABLE void setEnvironment(tesseract_environment::Environment::Ptr env);
   Q_INVOKABLE void add(const QString& link_name1, const QString& link_name2, const QString& reason);
   Q_INVOKABLE void clear();
 
@@ -57,7 +57,7 @@ public:
   bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
 private:
-  tesseract::Tesseract::Ptr thor_ {nullptr};
+  tesseract_environment::Environment::Ptr env_ {nullptr};
 };
 }
 Q_DECLARE_METATYPE(tesseract_ignition::AllowedCollisionMatrixModel)

@@ -27,7 +27,7 @@
 #define TESSERACT_IGNITION_OPW_KINEMATICS_MODEL_H
 
 #ifndef Q_MOC_RUN
-#include <tesseract/tesseract.h>
+#include <tesseract_environment/core/environment.h>
 #include <QStandardItemModel>
 #include <QMetaType>
 #include <QMap>
@@ -53,7 +53,7 @@ public:
   OPWKinematicsModel &operator=(const OPWKinematicsModel &other);
   ~OPWKinematicsModel() override = default;
 
-  Q_INVOKABLE void setTesseract(tesseract::Tesseract::Ptr thor);
+  Q_INVOKABLE void setEnvironment(tesseract_environment::Environment::Ptr env);
   Q_INVOKABLE void add(const QString& group_name,
                        double a1, double a2, double b,
                        double c1, double c2, double c3, double c4,
@@ -64,7 +64,7 @@ public:
   bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
 private:
-  tesseract::Tesseract::Ptr thor_ {nullptr};
+  tesseract_environment::Environment::Ptr env_ {nullptr};
 
   /**
    * @brief A helper function to add the opw data to the model.

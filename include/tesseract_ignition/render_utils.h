@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#include <tesseract/tesseract.h>
+#include <tesseract_environment/core/environment.h>
 #include <tesseract_visualization/ignition/entity_manager.h>
 
 //#include <sdf/Sensor.hh>
@@ -55,13 +55,13 @@ namespace tesseract_ignition
     bool isInitialized() const;
 
     /**
-     * @brief Set the render tesseract object
+     * @brief Set the render environment object
      *
      * This is not required because it starts with an empty environment.
      *
-     * @param tesseract The tesseract object to initialize the scene with
+     * @param env The environment object to initialize the scene with
      */
-    void setTesseract(tesseract::Tesseract::Ptr tesseract);
+    void setEnvironment(tesseract_environment::Environment::Ptr env);
 
     /**
      * @brief Get Tesseract Object
@@ -70,21 +70,21 @@ namespace tesseract_ignition
      *
      * @return Tesseract Shared Pointer
      */
-    tesseract::Tesseract::Ptr getTesseract();
+    tesseract_environment::Environment::Ptr getEnvironment();
 
     /**
      * @brief Get Tesseract Object
      * @return Tesseract Const Shared Pointer
      */
-    tesseract::Tesseract::ConstPtr getTesseractConst() const;
+    tesseract_environment::Environment::ConstPtr getEnvironmentConst() const;
 
     /** @brief Set Tesseract commands to be applied to the scene and tesseract environment */
-    void setTesseractCommands(tesseract_environment::Commands commands);
+    void setEnvironmentCommands(tesseract_environment::Commands commands);
 
     /** @brief Set Tesseract joint values to be applied to the scene and tesseract environment */
-    void setTesseractState(const std::unordered_map<std::string, double>& joints);
-    void setTesseractState(const std::vector<std::string>& joint_names, const std::vector<double>& joint_values);
-    void setTesseractState(const std::vector<std::string>& joint_names,
+    void setEnvironmentState(const std::unordered_map<std::string, double>& joints);
+    void setEnvironmentState(const std::vector<std::string>& joint_names, const std::vector<double>& joint_values);
+    void setEnvironmentState(const std::vector<std::string>& joint_names,
                            const Eigen::Ref<const Eigen::VectorXd>& joint_values);
 
 //    /// \brief Count of pending sensors. Must be called in the rendering thread.

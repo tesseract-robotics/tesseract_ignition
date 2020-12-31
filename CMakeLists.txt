@@ -8,7 +8,6 @@ find_package(tesseract_environment REQUIRED)
 find_package(tesseract_support REQUIRED)
 find_package(tesseract_urdf REQUIRED)
 find_package(tesseract_visualization REQUIRED)
-find_package(tesseract REQUIRED)
 find_package(tesseract_command_language REQUIRED)
 find_package(cmake_common_scripts REQUIRED)
 
@@ -43,7 +42,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   tesseract::tesseract_environment_kdl
   tesseract::tesseract_support
   tesseract::tesseract_urdf
-  tesseract::tesseract
   tesseract::tesseract_visualization_ignition
   ${IGNITION-COMMON_LIBRARIES}
   ${IGNITION-RENDERING_LIBRARIES}
@@ -120,7 +118,6 @@ target_link_libraries(TesseractSetupWizard PUBLIC
   tesseract::tesseract_environment_kdl
   tesseract::tesseract_support
   tesseract::tesseract_urdf
-  tesseract::tesseract
   ${IGNITION-COMMON_LIBRARIES}
   ${IGNITION-GUI_LIBRARIES}
   ${IGNITION-RENDERING_LIBRARIES}
