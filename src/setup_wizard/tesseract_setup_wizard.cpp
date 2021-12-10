@@ -338,7 +338,7 @@ void TesseractSetupWizard::onGenerateACM(long resolution)
       else if (std::find(adj_second.begin(), adj_second.end(), pair.first.first) != adj_second.end())
         env->addAllowedCollision(pair.first.second, pair.first.first, "Adjacent");
       else
-        env->addAllowedCollision(pair.first.second, pair.first.first, "Allways");
+        env->addAllowedCollision(pair.first.second, pair.first.first, "Always");
     }
   }
 
